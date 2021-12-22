@@ -1,0 +1,29 @@
+_[A mail I wrote to the Vulkan advisory committee on Aug 4, 2015, 1:03 AM]_
+
+I had mostly checked out of this process because after actually doing some engine restructuring on my end, I looked at the Vulkan code vs. the OpenGL code and had basically decided that Vulkan was too far from an API design that I actually think is worth doing, so I just bagged it.  But in case the ranting is useful for folks who want to keep pushing on Vulkan from an ISV standpoint:
+
+After thinking about the problem more deeply, I found that I actually had really serious reservations about the entire design of Vulkan. It's all similar to my previous complaints about the dynamic objects, but it encompasses the entire pipeline system.
+
+Obviously a 3D application can be looked at as a set of n pipeline invocations of m unique pipelines, whereby "pipeline" I mean the complete state, including "dynamic" state.  If the majority of what an application wanted to do was create the pipeline set m and then pick from it at runtime, Vulkan seems fine, even though I might quibble further about the particulars.
+
+But the reality of most 3D applications is that m is extremely large, in fact usually intractably large.  This is the result of having so many elements comprising a pipeline that can each take on an (often large) number of distinct values.  You end up with a cartesian product effect which multiplies the total pipeline count dramatically.
+
+So in order to manage this otherwise intractable problem, the goal for a 3D API is to make it so that an application can _efficiently express_ all n invocations without actually creating all m unique pipelines, because it would simply be impossible to do so.
+
+The way Vulkan chose to tackle this problem - and perhaps it did so implicitly rather than explicitly, but still - is to state that everything is expected to be a uniquely created object, but you get a few specific groupings of these objects which you can recombine together to give you some other cartesian product that may or may not model the one your application actually needs.  These groups were presumably selected based on some union or intersection of IHV concerns based on a specific selection of today's GPUs, with some amount of lowest-common-denominator effects happening, I suspect. Only one of these types of groups - the descriptors - can be updated dynamically, whereas the rest are baked at creation time.
+
+The result of this approach is that if the terms of your app's cartesian product do not match the pre-grouped terms of the Vulkan API, you will basically have to implement your own caching system for one or more of the Vulkan objects, probably often all of them.
+
+This, to me, is a very bad idea, because what it effectively did is move the caching from the code that actually knew whether it needed to happen (the driver) to code that doesn't know if it needed to happen (the app).  If I'm running on a GPU that can just write the viewport to the command buffer and it's effectively free to vary, well, tough luck my friend, that GPU is still going to pay the entire cost of a dynamic object cache for the viewport state _because that cache exists in the app now, and the app doesn't know it doesn't need it_.
+
+This seems like a big mistake, because the problem with pipeline state in OpenGL was not _that_ the driver was caching things behind the app's back, but rather _when_ the driver was caching things behind the app's back.  So the goal in Vulkan here should have been simply to allow the app to articulate what part of the pipeline state varies and at what frequency, _not_ to make the app have to break pipelines into arbitrary pieces that have no particular relationship to what the application actually needs to do.
+
+Now, you can start trying to backpedal here and go "oh well we can change this particular state or that particular state so it will be easier to vary!" but that completely misses the point.  The point is that _Vulkan as an API is all about breaking things up into arbitrary groups, and generally does not do a good job expressing the difference between related pipelines in a way that lets the total code (app + driver) do the least amount of work to switch between them_.  It doesn't even attempt to set up a well thought-out, orthogonal API spec that treats state uniformly and allows for each GPU to take advantage of the efficiencies it has in its design.
+
+Fixing the "dynamic state" in Vulkan doesn't solve this problem, even if somehow done perfectly, because the majority of the state is still in the pipeline objects themselves.  There's nothing that says that a GPU next year won't be able to vary some part of the "compiled in" state of a Vulkan pipeline, but, oh well, those GPUs just don't get to take advantage of that.  I mean, I suspect that some GPUs _today_ can already vary the "compiled in" state dynamically, so it's kind of failing on day one, let alone day ten thousand, or whatever OpenGL is on at this point.
+
+So looking at Vulkan vs. OpenGL, if I actually had to put money on it, I would bet that OpenGL would actually be _more performant_ going forwards compared to Vulkan, at least in terms of pipeline management, because although it is harder to write a driver for OpenGL for a number of other reasons, the actual part where you express the difference between pipelines is nearly optimal - an application can literally just set the specific piece of state that changed, and then move on.  In fact, you might say that as a GPU gets more capable of doing things dynamically, OpenGL gets more and more efficient, but Vulkan gets less and less, because on Vulkan you are still always paying for 100% of the pipeline management even if literally none of it was necessary, because it's in the app and the driver can't do anything about that.
+
+Ugh.  Now I'm depressed about this again... I am going to go eat some cookies or something.
+
+\- Casey
