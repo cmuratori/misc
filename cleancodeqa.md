@@ -50,6 +50,18 @@ I wrote a book a decade or so ago entitled _Clean Code_. It focused more on the 
 
 **BOB**: Milliseconds?  Of course.  I'd say that they all have modules where microsecond matter; and many have modules where nanoseconds matter.  
 
+*** 
+;-) I must have written the following while you were adding the next question.  So I had a merge to reconcile.  So here's what I said before I read your next question.  I'll answer that shortly.
+
+**Bob**: (The next day) By the way, I went back and watched the entirety of your video the other day.  I figured that since we were engaged in this discussion I ought to study the whole story you told.  And, although I was a bit miffed about some of your rhetoric, I have to complement you on a very sweet analysis.  
+
+The lovely insight that the areas of certain shapes can all be calculated using the same basic formula (KxLxW) is one of those moments that I think only programmers and mathematicians can truly appreciate.  
+
+Overall, I thought your video provided a good example of the kinds of things a programmer must do when solving a constrained problem within a resource constrained environment.  Clearly (at least I think it should be clear) one would not prefer the KxLxW solution in a resource rich environment unless one was very sure that the business would not extend the problem to general shapes.  And, indeed, even if the problem remained constrained to shapes that allowed the KxLxW solution, the separation into the more traditional formulae would likely better match other programmer's expectations; and would not cause them to puzzle over, and re-validate, the relatively novel approach.  While this might deprive them of a delicious moment of insight, it would allow them to get on with their tasks without delay.
+
+I don't know if you've read the work of Don Norman.  Long ago he wrote a book entitled _The Design of Everyday Things_.  It's well worth the read.  Within those pages he stated the following rule of thumb: _“If you think something is clever and sophisticated beware -- it is probably self-indulgence.”_  In a resource rich environment I fear the KxLxW solution could fall afoul of this rule.
+
+
 **CASEY**: OK great, it sounds like we've gotten onto the same page about software categories. I'd like to give my characterization of the coding practice you're describing as it applies to something like LLVM, since that is a piece of software from the list I gave, and it happens to be open source so we know exactly how it is constructed (unlike, say, Visual Studio).
 
 What I take you to be saying in the above paragraphs - and in your books and lectures - is that when programming a large piece of software like LLVM, the programmers do not need to be concerned about performance when they are programming. They should be primarily concerned with their own productivity. If it were, to use your previous example, a simple calendar app, then they would ideally __never__ think about performance. But in LLVM, since that is in the category where sometimes "nano/micro/milliseconds matter", then they will have to think about performance at some point. That point is when they find the program is running too slowly, whenever that occurs.
