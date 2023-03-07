@@ -50,6 +50,19 @@ I wrote a book a decade or so ago entitled _Clean Code_. It focused more on the 
 
 **BOB**: Milliseconds?  Of course.  I'd say that they all have modules where microsecond matter; and many have modules where nanoseconds matter.  
 
+*** 
+>  _I must have written the following while you were adding the next question.  So I had a merge to reconcile.  So here's what I said before I read your next question.  I'll answer that shortly.
+
+**Bob**: (The next day) By the way, I went back and watched the entirety of your video the other day.  I figured that since we were engaged in this discussion I ought to study the whole story you told.  And, although I was a bit miffed about some of your rhetoric, I have to complement you on a very sweet analysis.  
+
+The lovely insight that the areas of certain shapes can all be calculated using the same basic formula (KxLxW) is one of those moments that I think only programmers and mathematicians can truly appreciate.  
+
+Overall, I thought your video provided a good example of the kinds of things a programmer must do when solving a constrained problem within a resource constrained environment.  Clearly (at least I think it should be clear) one would not prefer the KxLxW solution in a resource rich environment unless one was very sure that the business would not extend the problem to general shapes.  And, indeed, even if the problem remained constrained to shapes that allowed the KxLxW solution, the separation into the more traditional formulae would likely better match other programmer's expectations; and would not cause them to puzzle over, and re-validate, the relatively novel approach.  While this might deprive them of a delicious moment of insight, it would allow them to get on with their tasks without delay.
+
+I don't know if you've read the work of Don Norman.  Long ago he wrote a book entitled _The Design of Everyday Things_.  It's well worth the read.  Within those pages he stated the following rule of thumb: _“If you think something is clever and sophisticated beware -- it is probably self-indulgence.”_  In a resource rich environment I fear the KxLxW solution could fall afoul of this rule.
+
+> _This was written before Casey read my comment above._
+
 **CASEY**: OK great, it sounds like we've gotten onto the same page about software categories. I'd like to give my characterization of the coding practice you're describing as it applies to something like LLVM, since that is a piece of software from the list I gave, and it happens to be open source so we know exactly how it is constructed (unlike, say, Visual Studio).
 
 What I take you to be saying in the above paragraphs - and in your books and lectures - is that when programming a large piece of software like LLVM, the programmers do not need to be concerned about performance when they are programming. They should be primarily concerned with their own productivity. If it were, to use your previous example, a simple calendar app, then they would ideally __never__ think about performance. But in LLVM, since that is in the category where sometimes "nano/micro/milliseconds matter", then they will have to think about performance at some point. That point is when they find the program is running too slowly, whenever that occurs.
@@ -59,4 +72,11 @@ In LLVM, perhaps that is the first time someone tries to build a truly large pro
 That's how I interpret what you're saying so far, and also how I interpretted things you've said recently like "If my Clojure code is too slow, I can always drop down to Java", meaning that you could rewrite a portion of the code in Java if that part needed more performance.
 
 Is that a fair characterization?
+
+**Bob**
+I'm one of those signatories of the Agile Manifesto who still believes in a bit of up-front architecture and design.  (Actually, I'm pretty sure they all do.  It was the latter zealots who thought it better to leap into code without any forethought).  
+
+In the case you mentioned I _hope_ I would have thought through the problem well enough to recognize where I might run in to performance problems and to therefore treat those modules with greater attention.  For example, I might have created a very attenuated version of the module and then subjected it to a torture test while profiling the behavior.  My concern, of course, would be the investment of a large amount of time and effort into an approach that ultimately failed to meet my customer's needs.  (Ask me why I worry about things like that ;-).  
+
+The bottom line, of course, is that Single Factor Analysis is _always_ suboptimal.  There is no _ONE TRUE WAY_.  (A point I tried to make several times in _Clean Code_.)
 
