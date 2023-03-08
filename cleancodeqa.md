@@ -79,6 +79,8 @@ In the case you mentioned I _hope_ I would have thought through the problem well
 
 The bottom line, of course, is that Single Factor Analysis is _always_ suboptimal.  There is no _ONE TRUE WAY_.  (A point I tried to make several times in _Clean Code_.)
 
+***
+
 **CASEY**: I have a lot of questions I'd like to ask already, but your last answer segues into one of them best so I'll go with that one :) Already in this conversation you have talked about several critical performance implications in software architecture: the "nanosecond" concerns of an IDE parser, the division of "modules" into nano/micro/milli/second response time requirements, the suggestion that a programmer (in this case, you) might create "a very attenuated version of the module and then subjected it to a torture test while profiling the behavior" before writing a piece of software to ensure that the performance would be acceptable, and even the idea that you might have to pick different languages depending on the performance requirements (Clojure vs. Java vs. C, in your example).
 
 And in summary, you've said, "Knowing these environments, and knowing which is best for the problem at hand, is something we all need to be proficient at".
@@ -92,3 +94,16 @@ https://www.youtube.com/playlist?list=PLmmYSbUCWJ4x1GO839azG_BBw8rkh-zOj
 If performance concerns are as important as you suggest they are in this thread, why isn't there at least one hour out of nine dedicated to explaining to the audience the importance of things like learning about performance, planning ahead of time about what parts of the code may have performance implications, avoiding performance-harmful programming constructs in those situations, creating performance tests beforehand like the kind you described in the previous answer, etc.?
 
 Another way to ask this question would be, is it possible you have taken for granted how important performance awareness actually is _even to you_, because perhaps you are habitually doing it when you program yourself, and thus you have not given it the prominence necessary to ensure your audiences - who often will know very little about performance - actually think about it at the right times and in the right ways? Especially if, as you said, "we all need to be proficient" at these things?
+
+**BOB:** Frankly, I think that's a fair criticism.  And, as it happens, I taught a class yesterday in which I spent morme time talking about the performance costs, as well as the productivity benfits, of the disciplines and principles that I teach.  So thank you the nudge.
+
+I don't think I used the word _surprised_.  Or if I did it was not in reference to the topic; it was more about the tone.  Enough said about that.
+
+You asked me whether I had been taking the importance of performance for granted.  After some self-reflection I think that's likely.  I am not an expert in performance.  My expertise is in the pactices, disciplines, design principles, and architectural patterns that help software development teams efficiently build and maintain large and complex software systems.  And as every expert knows, and must fight against, expert hammers think everything looks like a nail. 
+
+You also asked me "why...".  To the extent that I have not answered that above, I'll simply turn the question around and point out that it is probably for the same reason that your video was solely focussed on the amplification of performance to the strident denigration of every other concern.  To a performance hammer, everything looks like a nail.  ;-)
+
+That being said, I'm finding this conversation to be more beneficial than I had initially anticipated.  It has nudged a change in my perspective.  You should not expect that change to be enormous.  You should not expect me to make videos about how horrible Clean Code is ;-).  But if you watch the next 9 hour suite of videos I make, you'll probably see more than "barely a nod" towards performance issues.  I think you can expect two or three nods.  ;-)  
+
+Because, as you pointed out, I do consider performance issues to be important enough to anticipate and plan for.
+
