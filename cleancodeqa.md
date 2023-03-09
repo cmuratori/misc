@@ -4,7 +4,7 @@ Most explanations on Clean Code I have seen from you include all the things I me
 
 **BOB**: The disconnect.  Hmmm.  I’m not sure there is one.  
 
-I watched the first half of your video.  After that I figured that I had caught the drift.  I responded in one thread that I thought your analysis was essentially correct. I also thought that your rhetoric was a bit inaccurate in representing “clean code”.  I don’t remember exactly what that inaccuracy was; and it doesn’t really matter. 
+I watched the first half of your video.  After that I figured that I had caught the drift.  I responded in one thread that I thought your analysis was essentially correct. I also thought that your rhetoric was a bit inaccurate in representing “clean code”.  I don’t remember exactly what that inaccuracy was; and it doesn’t really matter.
 
 So…. Yes, absolutely, the structures you were presenting are not the best way to squeeze every nanosecond of performance out of a system. Indeed, using those structures can cost you a lot of nanoseconds.  They are not efficient at the nanosecond level.  Long ago this would have been generally important.  We worried about the cost of function call overhead and indirection.  We even unwound loops if we could.  This was especially true in embedded real time environments.
 
@@ -115,3 +115,21 @@ And that's on a Zen2 chip, which is extraordinarily fast!  Whatever organization
 
 So we could definitely end the conversation here. If you'd like to keep it going, the next thing to talk about would be the "strident denigration" you referred to. That would take us into architecture territory, not merely performance, but I'm happy to go there if you'd like. You're choice!
 
+**BOB**: That video was hysterical.  I gotta ask what browser you were using.  I'm using Vivaldi (a Chrome fork) and it exhibits the same kind of lag. (Though not quite as bad as yours.) So I did a few experiments.  It turns out that the lag has nothing to do with the size of the file.  Rather, it has to do with the size of the _paragraph_.  The longer the paragraph the longer the lag.  Indeed, this paragraph is already unable to keep up with the 25cps repeat rate.  And the more I type in this paragraph the worse the lag gets.
+
+Now why would that be?  First of all, I imagine that we are both typing into the same javascript code.  After all, nobody wants to use the tools written into the browser anymore ;-)  I mean, JavaScript is just _so much better_.  Secondly, I also imagine that the author of this code never anticipated that you and I would pack whole paragraphs into a single line.  (Note the _line_ numbers to the left.)  Even so, the lag becomes very apparent at the 25cps rate by about 200-300 characters.  So what could be going on?
+
+Could it be that the programmer used a badly written data structure that grows by allocating a new memory block every time it grows, and then copies the data into the new block?  I rembmer the old Rouge Wave C++ Library had a growing string like that.  Boy, oh boy, could that get slow!  You can do the math.  That's O(n^2) if you ask me.  
+
+Of course that's much more of an algorithm problem than straight forward efficiency problem.  And, indeed, the algorithm is always the first place to look when something seems too slow.  But, your point is well taken.  The programmer here simply never anticipated the kind of use we are putting their code too; and it just doesn't deal well the unanticipated load.  They didn't think it all the way through.
+
+Perhaps you and I should
+hit return at the end of 
+our lines from now on. ;-)
+
+         10        20        30        40        50        60        70        80
+....:....|....:....|....:....|....:....|....:....|....:....|....:....|....:....|
+Anyway, I am curious about the architectural issues you seem to have queued up
+for me. So, let us continue this conversation, while limiting our lines to 80 
+characters -- you know, like a Holerith card.  That way, no matter what kind 
+of chip this code executes on, it'll probably be able to keep up.  >B^D
