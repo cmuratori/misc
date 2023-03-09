@@ -127,9 +127,9 @@ Perhaps you and I should
 hit return at the end of 
 our lines from now on. ;-)
 
-         10        20        30        40        50        60        70        80
-....:....|....:....|....:....|....:....|....:....|....:....|....:....|....:....|
-Anyway, I am curious about the architectural issues you seem to have queued up
-for me. So, let us continue this conversation, while limiting our lines to 80 
-characters -- you know, like a Holerith card.  That way, no matter what kind 
-of chip this code executes on, it'll probably be able to keep up.  >B^D
+                  10        20        30        40        50        60        70        80
+         ....:....|....:....|....:....|....:....|....:....|....:....|....:....|....:....|
+         Anyway, I am curious about the architectural issues you seem to have queued up
+         for me. So, let us continue this conversation, while limiting our lines to 80 
+         characters -- you know, like a Holerith card.  That way, no matter what kind 
+         of chip this code executes on, it'll probably be able to keep up.  >B^D
