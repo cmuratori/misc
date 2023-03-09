@@ -95,7 +95,7 @@ If performance concerns are as important as you suggest they are in this thread,
 
 Another way to ask this question would be, is it possible you have taken for granted how important performance awareness actually is _even to you_, because perhaps you are habitually doing it when you program yourself, and thus you have not given it the prominence necessary to ensure your audiences - who often will know very little about performance - actually think about it at the right times and in the right ways? Especially if, as you said, "we all need to be proficient" at these things?
 
-**BOB:** Frankly, I think that's a fair criticism.  And, as it happens, I taught a class yesterday in which I spent morme time talking about the performance costs, as well as the productivity benfits, of the disciplines and principles that I teach.  So thank you the nudge.
+**BOB**: Frankly, I think that's a fair criticism.  And, as it happens, I taught a class yesterday in which I spent morme time talking about the performance costs, as well as the productivity benfits, of the disciplines and principles that I teach.  So thank you the nudge.
 
 I don't think I used the word _surprised_.  Or if I did it was not in reference to the topic; it was more about the tone.  Enough said about that.
 
@@ -106,4 +106,12 @@ You also asked me "why...".  To the extent that I have not answered that above, 
 That being said, I'm finding this conversation to be more beneficial than I had initially anticipated.  It has nudged a change in my perspective.  You should not expect that change to be enormous.  You should not expect me to make videos about how horrible Clean Code is ;-).  But if you watch the next 9 hour suite of videos I make, you'll probably see more than "barely a nod" towards performance issues.  I think you can expect two or three nods.  ;-)  
 
 Because, as you pointed out, I do consider performance issues to be important enough to anticipate and plan for.
+
+**CASEY**: Honestly the nudge was most of what I hoped to accomplish here :)  And just to emphasize how important I think performance is today, I noticed while trying to edit this very file on github that if I type a paragraph that is too many lines long, it starts to get very slow and it's difficult to type!  It's only a few hundred characters, but there's so many layers of things piled up in the system that what should be instantaneous becomes unusably slow.  So one of the reasons I harp on performance so much is because it seems like software is getting unusably slow these days, even for simple tasks. In fact, just so you know I'm not making this up, here is a video where I record just how incredibly slow it was to type this paragraph:
+
+https://www.youtube.com/watch?v=gPgm28zXNEE
+
+And that's on a Zen2 chip, which is extraordinarily fast!  Whatever organizational forces (perhaps even cross-company in this case) make this sort of thing common would benefit greatly from hearing, for example, _exactly_ what you said earlier in this conversation.  There are tons of organizations that absolutely don't think about the "nano/micro/milli/second" breakdown, and they need to!  Just putting that thought in their heads - that they need to have institutional ability to recognize where performance problems will be _early_, before it's too late, and to have institutional players with the power to address those problems - would be a _major_ improvement in most development organizations.
+
+So we could definitely end the conversation here. If you'd like to keep it going, the next thing to talk about would be the "strident denigration" you referred to. That would take us into architecture territory, not merely performance, but I'm happy to go there if you'd like. You're choice!
 
