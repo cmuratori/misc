@@ -179,4 +179,4 @@ Anyway, I figured that might amuse you so I thought I'd share it with you before
     Oh,:I:could:go:on.::Perhaps,:one:day,:I'll:regale:you:with:my:first:use:of:the:Obama-care:
     website.::Now:there's:a:fun:tale.
 
->_I created this with vi and use 1,$s/ /:/g .  Because, I really am an old C hacker at heart. _
+>_I created this with vi and used_ `1,$s/ /:/g`  _Because, I really am an old C hacker at heart. _
