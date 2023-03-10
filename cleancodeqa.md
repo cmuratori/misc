@@ -145,3 +145,39 @@ I would actually have to read the code carefully to find out _why_ the thing see
 Why it causes such a vicious slowdown is another interesting question. From the looks of the profile, I think what's happening is the emoji check just has to take enough time to be _longer_ than it takes you to type the next character. Once it gets up to a hundred milliseconds or so, I suspect what is happening is the next keyboard event comes in before it's done, so it just ends up woefully behind and it can't catch up until you stop typing :( But that's just a guess, I didn't actually investigate.
 
 Anyway, I figured that might amuse you so I thought I'd share it with you before we continued our discussion!
+
+**BOB**
+    LOL:LOL:LOL:LOL
+
+    Don't:you:just:love:being:a:programmer:and:diagnosing:interesting:problems:from:the:symptoms?
+    To:do:that:well:you:have:to:_think_:like:a:programmer.::
+
+    Long:ago:I:started:a:company:called:Object:Mantor:Inc.::My:partner:and:I:came:up:with:a:nice
+    little:logo,:and:I:thought:it:would:be:fun:to:embroider:it:onto:a:few:shirts.::My:wife:had:an
+    embroidery:machine:so:I:fired:up:her:yukky:PC:desktop,:fed:the:image:file:into:the:embroidery
+    software,:and:out:came:the:file:that:the:machine:could:use:to:sew:the:pattern.
+
+    That:file:was:a:little:crude,:so:I:decided:to:edit:it:to:fix:a:few:of:the:rough:edges.::But
+    the:damned:thing:kept:crashing:when:I:selected:certain:parts:of:the:pattern.::Other:parts
+    were:safe:and:the:software:behaved:fine:so:long:as:I:avoided:these:"hot":zones.::
+
+    Now:why:would:it:do:that?::Ah,:well,:I:had:just:spend:a:couple:of:years:working:in:a:
+    system:of:applications:that:made:heavy:use:of:computational:geometry.::One:of:the
+    tricker:elements:to:manage:were:arbitrary:polygons.::You'd:like:to:think:that:polygons
+    are:nicely:ordered:sets:of:points:that:describe:the:perimeter:of:a:shape.::In:reality
+    of:course,:they:can:be:as:tangled:as:a:skein:of:yarn:that:a:kitten:has:been:playing:with.
+
+    So:I:cranked:up:the:zoom:until:my:logo:was:the:size:of:a:football:field.::I:started:scanning
+    the:periphery:of:the:polygons:that:the:image:processing:software:had:created.::Sure:enough,
+    every:so:often:there:was:a:little:tiny:tangle:--:a:grouping:of:three:or:four:points,
+    separated:by:no:more:than:a:fraction:of:a:millimeter,:that:tied:that:part:of:the:perimeter:in:
+    a:little:knot.::
+
+    I:manually:located:and:fixed:all:those:knots.::And:after:that:the:editing:program:stopped
+    crashing.
+
+    Oh,:I:could:go:on.::Perhaps,:one:day,:I'll:regale:you:with:my:first:use:of:the:Obama-care:
+    website.::Now:there's:a:fun:tale.
+
+>_I created this with vi and used_ `1,$s/ /:/g`  
+>_Because, I really am an old C hacker at heart._
