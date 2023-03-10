@@ -133,3 +133,15 @@ our lines from now on. ;-)
          for me. So, let us continue this conversation, while limiting our lines to 80 
          characters -- you know, like a Holerith card.  That way, no matter what kind 
          of chip this code executes on, it'll probably be able to keep up.  >B^D
+
+**CASEY**: I couldn't resist, so I looked at the performance capture in Chrome and we now know who the culprit is :) It's the "emoji picker"! And your guess about the kind of problem was not far off.
+
+I only glanced at the code, but the issue appears to be that every time you type a character, the "emoji picker" will scan backwards in the text to see if what you have typed is an emoji. You can see it "work" if you type, say, a colon followed by "bacon" or whatever. When you do that it will put up a little drop-down for emoji completions and show the cute little bacon icon. I can't recall ever using (or wanting) this feature, but, I guess it's there if we... uh... need it? Anyway, for long paragraphs this scanning process eventually gets slow enough to prevent responsive processing of keystrokes.
+
+However, this newfound knowledge does provide us with a "work-around". Whenever we get to the point in a paragraph where the github text editor becomes prohibitively slow, we can just _pretend we are starting a new emoji_ and this solves the problem by preventing the picker from scanning as far backward. We can do this by just typing a colon, because that's the thing that normally starts emoji! For example, right now this paragraph is starting to be really sluggish. So I'm just going to put a colon right here : and voila! Now I'm back to normal typing speed, no worries. I could probably go a few more sentences like this just fine. Of course, I'd have to drop another colon at that point, but, it seems a small price to pay to see what I'm typing.
+
+I would actually have read the code carefully to find out _why_ the thing seems to scan backwards so far, when obviously the emoji strings can't ever be that long. What's the maximum length of an emoji name? Twenty characters? Thirty? It can't be much. But the fact that my work-around works seems to indicate I'm not wrong about the problem. So I guess they must just have coded something like "scan backwards until you see a colon" and left it at that.
+
+Why it causes such a vicious slowdown is another interesting question. From the looks of the profile, I think what's happening is the emoji check just has to take enough time to be _longer_ than it takes you to type the next character. Once it gets up to a hundred milliseconds or so, I suspect what is happening is the next keyboard event comes in before it's done, so it just ends up woefully behind and it can't catch up until you stop typing :( But that's just a guess, I didn't actually investigate.
+
+Anyway, I figured that might amuse you so I thought I'd share it with you before we continued our discussion!
