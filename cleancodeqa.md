@@ -173,8 +173,10 @@ Anyway, I figured that might amuse you so I thought I'd share it with you before
     separated:by:no:more:than:a:fraction:of:a:millimeter,:that:tied:that:part:of:the:perimeter:in:
     a:little:knot.::
 
-    I:found:manually:located:and:fixed:all:those:knots.::And:after:that:the:editing:program:stopped
+    I:manually:located:and:fixed:all:those:knots.::And:after:that:the:editing:program:stopped
     crashing.
 
-    Oh,:I:could:go:on.::Perhaps,:on:day,:I'll:regale:you:with:my:first:use:of:the:Obama-care:
+    Oh,:I:could:go:on.::Perhaps,:one:day,:I'll:regale:you:with:my:first:use:of:the:Obama-care:
     website.::Now:there's:a:fun:tale.
+
+>_I created this with vi and use 1,$s/ /:/g .  Because, I really am an old C hacker at heart. _
