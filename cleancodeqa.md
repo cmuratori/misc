@@ -181,3 +181,25 @@ Anyway, I figured that might amuse you so I thought I'd share it with you before
 
 >_I created this with vi and used_ `1,$s/ /:/g`  
 >_Because, I really am an old C hacker at heart._
+
+**CASEY**: Now that we've discovered the secrets to efficient github text entry, we can move on to architecture :)
+
+I suppose the best place to start would be to confirm some things from "Clean Code" that I agree with, and say the extent to which I agree with them. There are two main things.
+
+First, I think we're in total agreement about basic code readability. Like you, I prefer code to be legible without comments, such that if you read a function from top to bottom, it more-or-less says in English what it does because the functions, variables, and types have been named so as to accurately portray their behavior. Obviously this isn't always _strictly_ possible, but that's the general goal. I don't love working with code that where all the variables are "a", "b", "c", "d", etc., or - and this is a real thing - code where all of the matrix operations in the entire program are written using two _global_ variables, A and B.
+
+That said, I'm fine with single-letter variable names if they _reference_ something specific. For example, if the top of a function has a comment saying "this implements such-and-such a paper", and the variables are named to coincide with equations in the paper, I might prefer that. If the thing being implemented is some kind of complicated math, where I'm going to have to read the paper anyway to really know what is going on, having the variables line up with the paper can be a help in that case.
+
+But otherwise, I like descriptive naming.
+
+Second, I do like tests. Even in the video that precipitated this conversation, the code has some "self-testing", which is to say that it shows the difference off of a reference sum, just to try to catch any bad code changes that produce an incorrect area summation. Similarly, in my "Performance-Aware Programming" Course (where the video comes from), we recently did an 8086 disassembler. The way I developed it was I wrote a bunch of test ASM listings, then made a batch file that would assemble them with NASM, disassemble them with my disassembler, then reassemble the disassembly with NASM. I could then diff the final result with the original NASM-produced binary and know that my disassembly was accurate.
+
+So I think we're roughly on the same page about tests. Where we might differ is to what extent tests "drive" the development process. I get the sense that your perspective is "write the tests first", or something close to that. I don't know that I would go that far. I tend to develop first, and as I find things where I think a test would help prevent regressions, I'll add the test then.
+
+I think there are two reasons for this. One is that my background is game development, which is a highly interactive (and subjective) medium where many things are difficult to test in an automated way. So while we can (and do) test things like memory allocators or math libraries as necessary, testing broader things like "can the player jump between these two ledges" is not really feasible. We can do replay testing, and randomized input testing, but there are a fair number of things that just aren't feasible to "drive" via testing. This is less the case when looking at someething like, say, a file server, where you can very explicitly define what the inputs and outputs should be ahead of time. So I do think it varies by type of application.
+
+The second reason I'm more judicious with tests is that the goal of tests is to save development time. If you end up writing tests that you don't use, or that don't find bugs, or that took longer to write and maintain than the number of bugs they prevented, that can be a lose. So I think there's a balance there, where not enough testing means that development takes longer because you have more bugs and spend more time hunting for "what broke" when you make changes, but too much testing means you spend a ton of time making tests that didn't actually bear fruit.
+
+And that, too, is application-specific, or even component-specific, because bugs have varying costs. I may be worried or even paranoid about bugs that could affect file integrity in a file server, but relatively unconcerned about pixel-accuracy bugs in the renderer for the buttons that control that file server. So what I'm going to test, and how rigorously, seems like it has to be somewhat flexible if the goal is to minimize the total development time for a project.
+
+But, like I said, I think we probably agree more on readability and testing than we disagree. I might just put more emphasis on weighing the costs when it comes to testing. Does that seem like an accurate summary?
