@@ -208,22 +208,22 @@ But, like I said, I think we probably agree more on readability and testing than
 
 >_Descriptive Names_
 
-My rule for variable names is that the length of a variable's name should be proportional to the size of the scope that contains it.  The name `i` is perfectly valid within a one or two line scope.  Much larger than that, and you should likely use a small word, like `index`.  I'd make the same exception you do for well known formula.  If you are writing the code for the quadratic formula, `a`, `b`, and `c` are the right names to use regardless of the number of lines in the scope.  
+My rule for variable names is that the length of a variable's name should be proportional to the size of the scope that contains it.  The name `i` is perfectly valid within a one or two line scope.  Much larger than that, and you should likely use a small word, like `index`.  I'd make the same exception you do for well known formulae.  If you are writing the code for the quadratic formula, `a`, `b`, and `c` are the right names to use regardless of the number of lines in the scope.  
 
 BTW, my rule for functions is the opposite.  The name of a function (or a class) should be _inversely_ proportional to the size of the scope that contains it.  This is mostly for convenience (small names are easier to call) but also because at large scopes functions tend to be general, requiring no modifiers.  At smaller scopes we need adjectives or other modifiers to properly describe the function.  And, of course, exceptions apply as before.
 
 >_Tests_
 
-I am perhaps a bit more rigorous in the way I write tests.  I tend to write failing tests first, and then make them pass, is a very short cycle.  This helps me think through the problem.  It also gives me the perspective of writing the code _after_ something has used it.  Finally, it leaves me with a suite of tests that has very high coverage, and that I have seen both pass and fail.   And that means I trust that test suite.
+I am perhaps a bit more rigorous in the way I write tests.  I tend to write failing tests first, and then make them pass, in a very short cycle.  This helps me think through the problem.  It also gives me the perspective of writing the code _after_ something has used it.  It often forces me to decouple elements from each other so that they can be independenly tested.  Finally, it leaves me with a suite of tests that has very high coverage, and that I have seen both pass and fail.   And that means I trust that test suite.
 
 But I also face the same dilemma you do.  I cannot practically write tests for things that I have to see in order to know that they work.  GUIs, Game behaviors, Hardware interactions, etc.  Writing tests for these things is pointless because I don't know the correct answer up front.  So I have to use my eyes in a very tight cycle making small changes to the code until the behavior matches my "feeling" for correctness.  
 
 After that I _might_ write a test if I think it's a behavior I want to anchor.  But often I leave that code untested.
 
 Two examples:
-  1. _Spacewar_.  On my gitub site you'll see a project named `Spacewar`.  It's funn little Star Trek game patterned after the kind of games we used to play in the 80s.  It's written in Clojure and is very interactive.  I tested the hell out of the computational behavior; but could not test the interactive graphics.  If you look at that code you can see that one side is heavily tested, and the other side is not.
+  1. _Spacewar_.  On my gitub site you'll see a project named `Spacewar`.  It's fun little Star Trek game patterned after the kind of games we used to play in the 80s.  It's written in Clojure and is very interactive.  I tested the hell out of the computational, physics, and AI behaviors; but could not practically test the interactive graphics.  If you look at that code you can see that one side (the engine) is heavily tested, and the other side (the GUI) is not.
   2. _more-speech_.  Also on my github site you'll see a project called `more-speech`.  It is a browser and client for the `nostr` network.  It has a GUI component, and a lot of internal message processing.  The latter is tested, the former is tested less so.  
 
-Why do I use the test-first-discipline?  You named a bunch of reasons above, but neglected one that I consider to be the overriding impetus.  When I have a suite of test that I trust, and that has high coverage, I can refactor that code without fear.  I can improve the design.  I can add new features.  I can make the code more performant.  And so long as all those tests continue to pass I can be certain, beyond reasonable doubt, that nothing has broken.  That ability makes me go _fast_.  
+Why do I use the test-first-discipline?  You named a bunch of reasons above, but neglected one that I consider to be the overriding impetus.  When I have a suite of tests that I trust, and that has high coverage, I can refactor that code without fear.  I can improve the design.  I can add new features.  I can make the code more performant.  And so long as all those tests continue to pass I can be certain, beyond reasonable doubt, that nothing has broken.  That ability makes me go _fast_.  
 
-I consider it to be the equivalent of double-entry bookkeeping for accounting.  I try to say everything twice and make the two statements agree.
+I consider it to be the equivalent of double-entry bookkeeping for accounting.  I try to say everything twice and make sure the two statements agree.
