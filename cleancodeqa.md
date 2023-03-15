@@ -269,7 +269,8 @@ The cases of switch statements create an oubound network of dependencies towards
 
 On the other hand, if one uses dynamic polymorphism (OO) instead of a switch statement, then those compile time dependencies are _inverted_.  The lower level modules become subtypes that depend upon the higher level base type.  The source code dependencies then point in the opposite direction of the flow of control.  This is _Dependency Inversion_, and it prevents changes at to low level modules from forcing a wave of recompilation and redeployment from sweeping through the system towards higher level modules.
 
-This notion of inverting dependencies is the foundation of my architectural argument.  But, perhaps, this is a good place for me to stop and get your reaction so far.  
+This notion of inverting dependencies is the foundation of my architectural argument.  But, perhaps, this is a good place for me to stop and get your reaction so far.
+
 **CASEY**: That's actually great, because I don't see how that argument works, so starting there will be very illuminating.
 
 I don't disagree with the _term_ "dependency inversion", because in a sense you _are_ "inverting" something (to me, it is analogous to swapping the dimensions of an array). But from my perspective you are not creating a benefit, you are simply making the same trade again, where you favor _operand_ addition at the expense of _operation_ addition.
