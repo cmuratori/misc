@@ -237,3 +237,36 @@ I don't want to misrepresent your opinion so I'll leave full categorization of t
 Although I have worked in codebases that share that perspective, and have written that kind of code myself, I am unable to see the benefits of such an approach except in very rare circumstances which typically involve so little code that I don't tend to consider them as necessary considerations to the overall design. However, I am clearly in the minority, because OOP in general is obviously a very _popular_ approach today.
 
 So I'm hoping that this part of the discussion will give me the opportunity to point out all the ways I think operand-primal design results in _both_ slower development time _and_ slower code runtime, and get a proponent's response. But before we do that, perhaps you could respond to my categorization first, in case you'd like to either disagree with it or elaborate more?
+
+**Bob**:
+This is so much fun.  It is a pleasure to discuss these matters in such a professional and civil manner.  
+
+>_Tests: afterword_
+
+It seems the difference between us can be stated as follows:  
+ * I write tests unless there is a good reason not to.  
+ * You write tests when there is a good reason to.  
+
+I consider the former to be a _discipline_.  As a pilot I follow checklists unless there is a good reason not to.  I fly in good weather unless there is a good reason not to.  I submit myself to air traffic control, even when legally unecessary, unless there is a good reason not to.  
+
+>_Categorization: The Primality of Operand vs Operation_
+
+I like the categorization.  Indeed I wrote a whole chapter in _Clean Code_ on this topic, though I didn't use your names (Chapter 6: Objects and Data Structures).  OO (Operand Primal) is a great way to add types to existing functions without changing those functions.  Procedural (Operation Primal) is a great way to add new functions to existing types without changing those types.
+
+The question, of course, is which of those two is the most efficient?
+
+ * From the point of view of counting nanoseconds, OO is less efficient.  You made this point in your video.  However, the cost is relatively small if the functionality being deployed is relatively large.  The _shape_ example, used in your video, is one of those cases where the deployed functionality is small.  On the other hand, if you are deploying a particular algorith for calculating the pay of an employee, the cost of the polymorphic dispatch pales in comparison to the cost of the deployed algorithm.
+ * From the point of view of programmer effort, OO may or may not be less efficient.  It _could_ be less efficient if you knew you had all the types.  In that case switch statements make it easier to add new functions to those types.  You can keep the code organized by function rather than type.  And that helps at a certain level of cognition.  All else being equal, programs are about functions.  Types are artificial.  And so organizing by function is often more intuitive.  But all else is seldom equal...
+ * From the point of view of flexibiliby and on-going maintenance, OO can be massively more efficient.  If I have organized my code such that types define the basic functionality, and variations in that functionality can be relegated to subtypes, then adding new variations to existing functionality is very easy and requires a minimum of modification to existing functions and types.  I am not forced to find all the switch statements that deploy functions over types and modify all those modules.  Rather I can create a new subtype that has all the variations gathered within it.  I add that new module to the existing system, without having to modify many other modules.
+
+That last bullet was a very brief and imperfect explanation of how OO helps programmers conform to _The Open-Closed Principle_ (OCP). i.e. it is better to add new modules than it is to change existing modules.
+
+Are there cases where using OO does not help conform to the OCP?  Certainly.  Again, if you know all the types, and you expect variation to be new basic functionality operating over all those types, then dynamic polymorphism (OO) works _against_ the OCP and switch statements work for it.  
+
+That would be the bottom line if it weren't for one other factor:  Dependencies.
+
+The cases of switch statements create an oubound network of dependencies towards lower level modules.  Each case may call out to those other modules, making the fan-out of the switch statement very high.  Any change to one of those lower level modules can force the switch statement, and all higher level modules that depend upon that switch statement, to be recompiled and redeployed.  That can be a very large cost.  
+
+On the other hand, if one uses dynamic polymorphism (OO) instead of a switch statement, then those compile time dependencies are _inverted_.  The lower level modules become subtypes that depend upon the higher level base type.  The source code dependencies then point in the opposite direction of the flow of control.  This is _Dependency Inversion_, and it prevents changes at to low level modules from forcing a wave of recompilation and redeployment from sweeping through the system towards higher level modules.
+
+This notion of inverting dependencies is the foundation of my architectural argument.  But, perhaps, this is a good place for me to stop and get your reaction so far.  
