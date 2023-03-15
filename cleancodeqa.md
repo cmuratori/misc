@@ -270,3 +270,24 @@ The cases of switch statements create an oubound network of dependencies towards
 On the other hand, if one uses dynamic polymorphism (OO) instead of a switch statement, then those compile time dependencies are _inverted_.  The lower level modules become subtypes that depend upon the higher level base type.  The source code dependencies then point in the opposite direction of the flow of control.  This is _Dependency Inversion_, and it prevents changes at to low level modules from forcing a wave of recompilation and redeployment from sweeping through the system towards higher level modules.
 
 This notion of inverting dependencies is the foundation of my architectural argument.  But, perhaps, this is a good place for me to stop and get your reaction so far.  
+**CASEY**: That's actually great, because I don't see how that argument works, so starting there will be very illuminating.
+
+I don't disagree with the _term_ "dependency inversion", because in a sense you _are_ "inverting" something (to me, it is analogous to swapping the dimensions of an array). But from my perspective you are not creating a benefit, you are simply making the same trade again, where you favor _operand_ addition at the expense of _operation_ addition.
+
+Specifically, suppose you have n types each supporting m operations. Any system design supporting this will therefore have O(nm) "things" in it, and the design question is how do you want to group them. We'll leave out the fact that sometimes this can be compressed (or "made more sparse") for now. Switches and classes do compress in different ways and I would like to talk about that later, but to avoid talking about too many things at once, let's first talk about the "worst case" where every operation does something different for every type.
+
+Dynamic polymorphism is the design where you have n groups of m operations. It ensures that if you would like to move from n types to n+1 types, then you are going to create one new thing (a class), probably in its own file, and then you will implement the m operations in that file. This means you only have to "recompile and redeploy", as you put it, that one file, or something on the order of that.
+
+By contrast, the switch statement design is where you have m groups of n operations. If we want to add a new type, we have to go through each of those operations and add the necessary logic to support the new type. This requires recompiling and redeploying m files instead of n files. I _assume_ this is the specific benefit to which you were referring, and I don't disagree with that premise.
+
+However, suppose that you instead want to add a new _operation_. Now I am leaving n the same and moving from m operations to m+1 operations. In your model, you now have to go through _every single class_ and add that new operation, which forces you to recompile and redeploy n files, one for every class.
+
+By contrast, the switch statement version is already separated by operation, so you do not need to touch any of the existing files (or modules, etc., whatever the division is we are imagining). You simply create one new file for this new operation, compile it, and deploy it. It is the exact mirror of the type case.
+
+So to me, there is no "win" here in the abstract. You are merely choosing _which_ programmer behavior you will make hard, and which you will make easy. By choosing dynamic dispatch, you make adding operations cost more, because it is the "inner multiple" in that grouping. By choosing static dispatch, you make adding types cost more, because _that_ is the "inner multiple" in that grouping.
+
+Note that in both cases you are always adding the same number of _things_ (member functions or cases). The only question is _how spread out_ they were. Both cases have one type of change where the code is clustered, and one type of change where the code is scattered, and they are exactly "inverted" in which one it is. But neither gets a win, because they are both equally good or equally bad when you consider both types of additions (types and operations).
+
+Clearly you view this differently, because you said, "That would be the bottom line if it weren't for one other factor:  Dependencies." where "bottom line" was already the idea that you're just trading off between ease of adding types vs. ease of adding operations. So I assume that means you think this "dependency inversion" does something _more_ than that "bottom line" already did, whereas I see it as being exactly the same bottom line as before: it's just the exact same tradeoff again.
+
+Where does your analysis differ?
