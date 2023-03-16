@@ -315,7 +315,7 @@ Thus, since they can be compiled down into identical binary code, there is no ne
 
 >_Source Code_
 
-As we have already agreed the swapping of `o` and 't` makes very little difference to the problem of source file management.  Individual cases may favor one style or another.  For example if we have stable operations but variable types then OO might be favored.  Or if we have stable types but variable operations then a Procedural style may be favored.
+As we have already agreed the swapping of `o` and `t` makes very little difference to the problem of source file management.  Individual cases may favor one style or another.  For example if we have stable operations but variable types then OO might be favored.  Or if we have stable types but variable operations then a Procedural style may be favored.
 
 So it looks like, all else being equal, the two styles have the same capabilities.  There is no Run Time difference, and the Source Code management issues are just mirrors of each other.
 
