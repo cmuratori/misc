@@ -344,4 +344,4 @@ From then on, we could write our applications without knowing, or caring what IO
 
 You could easily make the point that while the OO style protects high level policy from changes to low level detail, it also makes low level detail _vulnerable_ to changes in high level policy.  That's true.  And by the same token, the procedural style certainly makes high level policy vulnerable to changes in low level details, but protects those low level details from changes to the high level policies.
 
-So the question then becomes one of architectural philosophy: Which of those two is more likely to change?  Does policy change morem frequently than detail?  Or does detail change more frequently than policy?  
+So the question then becomes one of architectural philosophy: Which of those two is more likely to change?  Does policy change more frequently than detail?  Or does detail change more frequently than policy?  
