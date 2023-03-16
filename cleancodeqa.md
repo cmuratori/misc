@@ -296,7 +296,7 @@ Where does your analysis differ?
 **BOB**: Casey, we are on exactly the same page with one big exception: _Dependency Inversion_.  But first let me restate.
 
 Yes, every program composed of `o` operations and `t` types has a complexity of `o`x`t`.  
- * If we use OO we can increase `t` with minimum disruption to the source code; but increasing 'o` disrupts many source code modules.  
+ * If we use OO we can increase `t` with minimum disruption to the source code; but increasing `o` disrupts many source code modules.  
  * If we use switch statements we can increase `o` with minimum disruption to the source code; but increasing `t` disrupts many source code modules. 
  
 So I believe we understand each other so far.  
