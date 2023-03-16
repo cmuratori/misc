@@ -345,3 +345,7 @@ From then on, we could write our applications without knowing, or caring what IO
 You could easily make the point that while the OO style protects high level policy from changes to low level detail, it also makes low level detail _vulnerable_ to changes in high level policy.  That's true.  And by the same token, the procedural style certainly makes high level policy vulnerable to changes in low level details, but protects those low level details from changes to the high level policies.
 
 So the question then becomes one of architectural philosophy: Which of those two is more likely to change?  Does policy change more frequently than detail?  Or does detail change more frequently than policy?  
+
+**CASEY**: Before getting into the details here, what do you mean by "I propose a hypothetical compiler that produces identical binary code irrespective of whether the input is operand or operation primal"? Do you mean a hypothetical _language_, where it doesn't matter which you do? Because that doesn't seem very useful, since I could just say "I propose a hypothetical language where the dependency cost is always the same" or something, and then we have nothing to discuss because we are both talking about fictitious systems. It doesn't really address how we're supposed to write actual code, which is what we're talking about here.
+
+So are you suggesting that you think that current C++/JAVA/etc. compilers _do_ exhibit this property? I just want to unpack this so I can understand what you mean by the "run time" section above.
