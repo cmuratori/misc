@@ -354,3 +354,7 @@ So are you suggesting that you think that current C++/JAVA/etc. compilers _do_ e
 
 **CASEY**: I would again say that this is not a useful hypothetical for a discussion about real-world coding practices. In production, if you are compiling C++, the vast majority of programmers will be using CLANG, GCC, or MSVC. None of those do what you're describing. While virtual methods are always implemented with a vtable pointer in the object, switch statements can be optimized in a wide variety of ways, all of which are more optimal than an indirected function pointer (which is what all virtual calls are). The only time you will get similar optimization from a virtual function call is if it's not actually virtual because you have an explicit pointer to a derived type, and the method has been marked "final" for that type. And that is not a comparable case, because you wouldn't need a switch statement to handle that case either.
 
+**Bob**: My apologies for the distraction.  It was not my goal to start a debate about the possible existence of a hypothetical compiler.  My goal was only to set the performance aspects of the two different schemes aside so that we could focus on the architectural issues that you have proposed that we discuss.
+
+So, I hereby withdraw the hypothetical compiler from further consideration and recommend instead that we focus on the architectural effects of operand-primal vs operation-primal approaches.  
+
