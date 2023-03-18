@@ -358,3 +358,16 @@ So are you suggesting that you think that current C++/JAVA/etc. compilers _do_ e
 
 So, I hereby withdraw the hypothetical compiler from further consideration and recommend instead that we focus on the architectural effects of operand-primal vs operation-primal approaches.  
 
+**CASEY**: Well, we do still need to consider the run-time part of your claim though. If I can summarize the claim, it was:
+
+* Run-time: No difference
+* Source code: No difference
+* Dependency graph: Favors operand-primal
+
+If you are withdrawing the hypothetical compiler from consideration, is the claim now:
+
+* Run-time: Favors operation-primal
+* Source code: No difference
+* Dependency graph: Favors operand-primal
+
+or is it something else?
