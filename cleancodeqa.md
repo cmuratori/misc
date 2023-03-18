@@ -371,3 +371,5 @@ If you are withdrawing the hypothetical compiler from consideration, is the clai
 * Dependency graph: Favors operand-primal
 
 or is it something else?
+
+**Bob**: So stipulated.  Please proceed.
