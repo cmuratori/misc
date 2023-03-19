@@ -373,3 +373,15 @@ If you are withdrawing the hypothetical compiler from consideration, is the clai
 or is it something else?
 
 **Bob**: So stipulated.  Please proceed.
+
+**CASEY**: OK, proceeding from there, I'd like to now focus on whether or not there is actually a benefit from the dependency inversion that you're describing. This will probably take a few back-and-forths, but, I'll start with this:
+
+You gave the example of low-level IO routines, like reading bytes from a tape drive vs. a magnetic drive. I, of course, agree completely that there may be many circumstances where you would like to write a lot of code in terms of some series of operations like "open", "read", "close", and not care exactly what is being opened, read, or closed. But that goal can be achieved with either architecture.
+
+In the case of a class hierarchy, the user is passing around a base class pointer, and they call ->read() on it. In the case of a union (or any other non-hierarchy technique), you are passing around a pointer to that, and you call read() and pass the pointer as the argument. In neither case does the user have to know (or care) about what that call does.
+
+So I just want to start with some understanding of why you chose that example. It doesn't seem to me to differentiate between the two methods at all. From the user's perspective, the only difference they will experience is syntactic - eg., they type ptr->read(...) instead of read->ptr(...). But why do they care about that? What are the specific benefits they are getting from this?
+
+You mentioned "recompilation and redeployment". By "recompilation" I assume you mean that if you are calling through a blind table, then you do not need to recompile the calling code. By "redeployment", I'm not sure exactly what you are referring to, but I'm imagining a scenario where you would like to ship, say, several DLLs, and only send one new DLL instead of the entire set of DLLs?
+
+So perhaps you could elaborate on those, and then add any other benefits you think are flowing from this, so I can get the full picture?
