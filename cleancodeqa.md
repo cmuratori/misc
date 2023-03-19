@@ -394,5 +394,46 @@ I infer this agreement from your statement:
 It's probably worthwhile listing some of the reasons _why_ this separation is important to humans.
 
  * It allows us to replace low level details (e.g. IO devices) without impacting the source code of the high level policy.
- * It allows us to break up our deployment between high level and low level components.  So, for example, we could have a high level DLL/JAR/EPROM and a low level DLL/JAR/EPROM.  (I mention the EPROM because I used precisely this kind of separation in the early 80s with embedded hardware that had to be maintained in the field.  Shipping one EPROM was a lot better than shipping 32 ;-)
+ * It allows us to compile high level components without needing the compiler to read the low level components.  This protects the high level components from changes to those low level components.
+ * It allows us to set up a module hierarchy that has no dependency cycles. (No need for `#ifndefs` in the header files. ;-)  Which keeps order of compile and deployment deterministic.
+ * It allows us to break up our deployment between high level and low level components.  So, for example, we could have a high level DLL/JAR/EPROM and a low level DLL/JAR/EPROM.  (I mention the EPROM because I used precisely this kind of separation in the early 80s with embedded hardware that had to be maintained in the field.  Shipping one 1K EPROM was a lot better than shipping all 32 ;-)
  * It allows us to organize our source code by level, isolating higher level functionalities from lower level functionalities. At every level we eschew the lower level concerns, relegating them to source code modules that the current level does not depend upon.  This creates a hierarchy of concerns that is, in human terms, intuitive and easy to navigate.  
+
+You then said that this kind of isolation is possible with "either architecture". For the sake of this discussion I will accept the use of the term "architecture" to mean one of the two styles we are debating: operation primal vs operand primal.  
+
+So, are the bullet points above possible with both architectures? Let's set up an experiment.
+
+Here is the high level policy of my payroll system written in Java(ish).  I would like this source code module to be independent of all low level details.  That means no `import` statement can exist in this module that references a lower level module.
+
+  import Employee;
+  import DB;
+  import Date;
+  import Paycheck;
+  
+  public class Payroll {
+    public void doPayroll(Date payDate) {
+      for (Employee e : DB.getAllEmployees()) {
+        if (isPayDay(e, payDate)) {
+          Paycheck check = calculatePaycheck(e, payDate);
+          pay(e, check);
+        }
+      }
+    }
+  }
+
+This module is very high level.  It states the highest level algorithm for paying my employees.  It does not mention the fact that some employees are salaried, others are hourly, and others are commissioned.  It does not mention the fact that hourly employees are paid weekly, commissioned employees are paid twice a month, and that salaried employees are paid monthly.  It does not mention the fact that hourly employees are paid time and a half for overtime, or that commissioned employees are paid a base salary plus a commission on their sales reciepts.  It does not mention the fact that some employees want their paychecks directly deposited, while others want them mailed to their home, while still others want to pick up their pay from the paymaster.
+
+Using the operand primal style I can very easily ensure that the above module remains independent of all those details and that no `import` statement in this module mentions, directly or transitively, any module that implements those details.  I can compile the above module into a JAR file that could remain unchanged while the JAR files that contain all the details thrash endlessly under a barrage of requirements changes.
+
+Can I do that with the operation primal style?  You mentioned passing around a `union`.  I presume my module would have to `import` that `union`.  So how can I define that `union` such that it makes no mention of any of the afore mentioned details. I suppose we could use opaque (`void*`) pointers, and take advantage of the late binding of the linker to push the problem down one level.  But I'd like to see what you have in mind.
+
+You mentioned that the difference in my _Device Independence_ example was purely syntactic -- a matter of `ptr->read(...)` instead of `read->ptr(...)` by which I think you meant `ptr->read(...) vs read(ptr, ...)`  But I disagree, at least in part.  In my example the dynamic polymorphism of the _File_ abstraction was pushed across the boundary of the operating system.  The high level interface _File_ was usable by all applications.  The low level implementations were device drivers linked into the OS.
+
+This meant that I could write an application using the _File_ abstraction.  I could compile, link, and deploy it.  And it would still have no dependency upon, nor reference to, the low level devices it was intended to control.  That linkage occurred at runtime when the pointers to the `open/close/read/write/seek` functions were loaded into the _File_ vtable.  Thus, new IO devices could be added to the OS, and my application could control them, without the need to recompile, relink, and redeploy it.  It seems to me that might be tricky with the `union` approach.
+
+You asked me what I meant by recompilation and redeployment.  Recompilation is the act of rebuilding the application.  This can be as simple as `cc app` or as complex as a gigantic `makefile` can (um) make it.  The development team might have to build the app for N different plaftorms, and run all the tests for all those patforms.  The build procedure can take milliseconds, or it can take hours, depending on the application.
+
+Deployment has a similar range of complexities.  It might simply mean `cp app /usr/bin` or it might require a massive deployment of executables around a network of servers. It might require a very carefully tuned and timed startup procedure.  Depoyment can be a matter of milliseconds or days depending upon the complexity of the system.
+
+I hope this helps to answer your questions; because I am eager to get on with the _architecture_ part of our discussion.
+
