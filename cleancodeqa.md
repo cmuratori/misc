@@ -385,3 +385,14 @@ So I just want to start with some understanding of why you chose that example. I
 You mentioned "recompilation and redeployment". By "recompilation" I assume you mean that if you are calling through a blind table, then you do not need to recompile the calling code. By "redeployment", I'm not sure exactly what you are referring to, but I'm imagining a scenario where you would like to ship, say, several DLLs, and only send one new DLL instead of the entire set of DLLs?
 
 So perhaps you could elaborate on those, and then add any other benefits you think are flowing from this, so I can get the full picture?
+
+**Bob**: To begin with it appears that we agree that there is a benefit in organizing the source code such that high level policy does not depend upon low level detail. I think we also agree that this benefit is _human_ as opposed to mechanical.  By that I mean that the computer doesn't care whether high level source code is independent of low level source code.  Only the humans care about that.
+
+I infer this agreement from your statement: 
+>_"I, of course, agree completely that there may be many circumstances where you would like to write a lot of code in terms of some series of operations like "open", "read", "close", and not care exactly what is being opened, read, or closed."_
+
+It's probably worthwhile listing some of the reasons _why_ this separation is important to humans.
+
+ 1 It allows us to replace low level details (e.g. IO devices) without impacting the source code of the high level policy.
+ 1 It allows us to break up our deployment between high level and low level components.  So, for example, we could have a high level DLL/JAR/EPROM and a low level DLL/JAR/EPROM.  (I mention the EPROM because I used precisely this kind of separation in the early 80s with embedded hardware that had to be maintained in the field.  Shipping one EPROM was a lot better than shipping 32 ;-)
+ 1 It allows us to organize our source code by level, isolating higher level functionalities from lower level functionalities. At every level we eschew the lower level concerns, relegating them to source code modules that the current level does not depend upon.  This creates a hierarchy of concerns that is, in human terms, intuitive and easy to navigate.  
