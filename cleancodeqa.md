@@ -393,6 +393,6 @@ I infer this agreement from your statement:
 
 It's probably worthwhile listing some of the reasons _why_ this separation is important to humans.
 
- 1 It allows us to replace low level details (e.g. IO devices) without impacting the source code of the high level policy.
- 1 It allows us to break up our deployment between high level and low level components.  So, for example, we could have a high level DLL/JAR/EPROM and a low level DLL/JAR/EPROM.  (I mention the EPROM because I used precisely this kind of separation in the early 80s with embedded hardware that had to be maintained in the field.  Shipping one EPROM was a lot better than shipping 32 ;-)
- 1 It allows us to organize our source code by level, isolating higher level functionalities from lower level functionalities. At every level we eschew the lower level concerns, relegating them to source code modules that the current level does not depend upon.  This creates a hierarchy of concerns that is, in human terms, intuitive and easy to navigate.  
+ * It allows us to replace low level details (e.g. IO devices) without impacting the source code of the high level policy.
+ * It allows us to break up our deployment between high level and low level components.  So, for example, we could have a high level DLL/JAR/EPROM and a low level DLL/JAR/EPROM.  (I mention the EPROM because I used precisely this kind of separation in the early 80s with embedded hardware that had to be maintained in the field.  Shipping one EPROM was a lot better than shipping 32 ;-)
+ * It allows us to organize our source code by level, isolating higher level functionalities from lower level functionalities. At every level we eschew the lower level concerns, relegating them to source code modules that the current level does not depend upon.  This creates a hierarchy of concerns that is, in human terms, intuitive and easy to navigate.  
