@@ -405,21 +405,21 @@ So, are the bullet points above possible with both architectures? Let's set up a
 
 Here is the high level policy of my payroll system written in Java(ish).  I would like this source code module to be independent of all low level details.  That means no `import` statement can exist in this module that references a lower level module.
 
-  import Employee;
-  import DB;
-  import Date;
-  import Paycheck;
-  
-  public class Payroll {
-    public void doPayroll(Date payDate) {
-      for (Employee e : DB.getAllEmployees()) {
-        if (isPayDay(e, payDate)) {
-          Paycheck check = calculatePaycheck(e, payDate);
-          pay(e, check);
+    import Employee;
+    import DB;
+    import Date;
+    import Paycheck;
+
+    public class Payroll {
+      public void doPayroll(Date payDate) {
+        for (Employee e : DB.getAllEmployees()) {
+          if (isPayDay(e, payDate)) {
+            Paycheck check = calculatePaycheck(e, payDate);
+            pay(e, check);
+          }
         }
       }
     }
-  }
 
 This module is very high level.  It states the highest level algorithm for paying my employees.  It does not mention the fact that some employees are salaried, others are hourly, and others are commissioned.  It does not mention the fact that hourly employees are paid weekly, commissioned employees are paid twice a month, and that salaried employees are paid monthly.  It does not mention the fact that hourly employees are paid time and a half for overtime, or that commissioned employees are paid a base salary plus a commission on their sales reciepts.  It does not mention the fact that some employees want their paychecks directly deposited, while others want them mailed to their home, while still others want to pick up their pay from the paymaster.
 
