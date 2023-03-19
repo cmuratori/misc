@@ -432,3 +432,35 @@ Deployment has a similar range of complexities.  It might simply mean `cp app /u
 
 I hope this helps to answer your questions; because I am eager to get on with the _architecture_ part of our discussion.
 
+**CASEY**: It sounds like you're assuming that the programmer has to expose certain things in the "union" case that they do not actually have to expose. In practice it is no different from the hierarchy case in terms of how much _data_ you wish to expose. In the hierarchy case, for example, you _could_ put a bunch of data in the base class, which exposes it to the user. It's a _choice_ not to do that, which you make when you want to insulate the user from changes to that data.
+
+The same is true in the union case (or any other non-hierarchy method - there are others, which are often better than the union method depending on the circumstances). Here is what the user would see in, say, a typical H file of a non-hierarchy library:
+
+```
+struct file;
+file *Open(...);
+void Read(file *File, ...);
+void Close(file *File);
+```
+
+There is no need for any of the things that you're suggesting to be exposed. The only reason you would expose them is if you would like to get the performance increase that comes from allowing the compiler to optimize across the call. This choice is up to the maintainer, and they can choose to get the extra speed if they know that isolation is not beneficial, or they can choose not to get the extra speed is isolation is more important.
+
+This design doesn't require exposing anything you didn't _want_ to expose. Furthermore, unlike the hierarchy case, it does not impose any constraints on the designs of the datatypes. Contrary to what you suggested, it has _less_ constraints across the interface boundary, not more.
+
+Why? Because in the hierarchy case, you are moving the dispatch code from inside the library to outside the library. At compile time, the user of the library code is having the vtable dispatch code _compiled in_ to their program. Instead of just calling a function address and passing a pointer they know nothing about, which is what happens in the non-hierarchy style, they must _know_ how to translate that pointer into a function address by reaching into the operand and pulling something out (in this case a pointer to a vtable).
+
+Another way to say this is, you _are_ actually pushing an implementation detail across the boundary with the hierarchy design: you're mandating how operand pointers turn into function pointers, which is a _constraint_ on the layout of the underlying operand. It _must_ have that additional data stored in _precisely_ one way, and cannot be changed on either side of the boundary without recompiling the other side. This is why, for example, C++ vtable layouts had to be standardized: because otherwise there would be no way for two programs compiled with different compilers to call each other's virtual methods.
+
+Just to further illustrate this point using an extreme example, imagine if the library author decided they no longer want to use pointers for some internal reason. In the non-hierarchy case, this "just works". A pointer is just a number, and since the user of the library does not do anything with that number except pass it back to other library functions, it can be _anything_. It could just be an index into some table the library maintains. This is free to do and trivial to implement in the non-hierarchy case because the user's code never manipulates the pointer.
+
+Not so in the hierarchy case. In the hierarchy case, the user looks into the pointer all the time, to pull out the vtable address. There is no way to hand the user something else, like an index, because the vtable scheme has to have been agreed upon systemically by unrelated _companies_, not just teams (in this case, the compiler vendors). So it simply can't do anything like this.
+
+If anything, I see your arguments as actually being in favor of the non-hierarchy method, even though you seem to be saying they favor the hierarchy method. But I don't see how. The non-hierarchy method is a many ways a _superset_. It has more range both in terms of isolation from changes (no vtable scheme exposed), and in terms of performance because at the other end of the spectrum, the library author can choose to provide the entire source and give the user the option of compiling everything together for optimization purposes.
+
+So I am not seeing where the benefits of hierarchy-based design come in here. They seem strictly less flexible at both ends of the "compilation and deployment" spectrum. And this "worse at both ends" aspect of the design is a major reason I think the hierarchy case should be abandoned as a general architecture: the programmer never seems to be better off when using it. If they wanted isolation, they got _less_ isolation with a hierarchy than with a blind pointer. If they wanted performance, they got _less_ performance because optimization can't occur across base class virtual calls no matter how much of the source code you expose to the user. It's _always_ worse than the alternative.
+
+And the other important point here is that it is _continuous_ for the library author to make this decision in the non-hierarchy case. They can write a library that exposees only blind pointers, and then later decide to expose some or all of what those pointers point to, and the routines that operate on them, if/when they find that performance becomes a priority for a user. Even better, they can decide to give the user that choice if they wish: because the code itself doesn't change at all, only the amount of it exposed to the user changes, the user could choose how much exposure they want. If the user doesn't need the extra performance, they build without using the exposed source. If they do, they build with it, knowing they will have to recompile their code if the structures change in a future revision.
+
+Nothing like this is possible in the hierarchy case: the library vendor would have to manually rewrite everything to eliminate the virtual call hierarchy first in order to make a change like this, which requires substantial effort, perhaps even a prohibitive effort in a large library. This is because the choice to base the design around virtual calls prevents compiler optimization across calls _everywhere_, even internal to the library, and there is no easy fix.
+
+So hopefully this explains the confusion?
