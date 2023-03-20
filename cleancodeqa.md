@@ -526,6 +526,39 @@ But I think that's enough for this go-around.  So let me summarize where I think
  * And I HOPE we both agree that there is a time and place for dynamic late binding; such as plugins and frameworks.
  * And lastly, I hope we both agree that all these issues are human issues.  The computer does not care.
 
+**CASEY**: Regarding "You and I are apparently using a different definition of the term *union*.  I was assuming you meant the traditional C `union` in which the data members share the same memory space.", you were assuming correctly: the "file \*" I'm talking about would be exactly that kind of union. In other words, inside the library, it is:
 
- 
- 
+```
+enum file_type
+{
+  // Types of files go here
+};
+struct file
+{
+  file_type Type;
+  union
+  {
+    // Data storage types corresponding to file_type go here
+  };
+};
+```
+
+My point in the example is to demonstrate that you are able to either hide this or not depending on your preference. If you would like the user to be able to get optimization by compiling "through" the union, you put this in the H file. If you don't, you don't. It's your choice.
+
+Furthermore, you only need that union if the particular usage of the library _actually is_ polymorphic, which it might not be. For example, if the particular system you're running on only has one type of drive (to continue the example), then the version of the library for that platform doesn't need the union anymore, meaning that the linking will produce a direct link to the correct function. Contrast this with the inheritance hierarchy version, which _does not_ do that: it will still compile to an indirected vtable dispatch, which is less efficient for no reason. Of course, this is not an efficiency I actually care about much, because if we are already calling across a library boundary then it is unlikely to actually matter that much. But I'm just pointing it out as yet another point in favor of not using virtual functions.
+
+My point here relates back to my original point, which is that discriminated unions (C++ also has a janky std library version of these called "variants") seem to always be the better rule of thumb. If you use an inheritance hierarchy as your preferred mechanism for polymorphism, you are effectively "stuck". You cannot actually decide to change that decision later, because the code has already been written in such a way as to prevent optimization "through the union". On the other hand, if you use discriminated unions like this as your default case, then you can change your mind whenever you want. Start off with it hidden, if you want to keep compilation dependencies down. Move the structs and functions up into the .h file later later if you want to increase optimization.
+
+Regarding "Oddly, we seem to have replaced the operand/operation concept with the kind of late-binding we prefer", not really. I don't actually prefer this style of "guard against people using the code". Nor do I think it's how you would normally write things unless you actually expect there to be a great amount of late-addition of types to the system. I agree broadly, for example, with the "Data-oriented Design" people: most of the time, you would be better off if code always knew what type it was dealing with. If you have circles, rectangles, and triangles, then you have three separate arrays, one for each type, so that there never _is_ a dispatch.
+
+So I think the idea of structuring code around swappable types is generally wrong. I think it should only be used when you are specifically designing the boundary of a library or plug-in system, and rarely anywhere else. I really am "operation first", never "operand first". The point of the `file` example was to point out that it is _also_ trivial to take union-style code and hide its implementation details if you want to. It is incorrect to suggest that it is "worse" than inheritance hierarchies at this somehow. I _disagree_ than inheritance hierarchies have a "dependency inversion" advantage, and my understanding of your argument was that that was what you were suggesting.
+
+I'm also not sure how "And lastly, I hope we both agree that all these issues are human issues.  The computer does not care." squares with "We both agree that it is sometimes necessary to abandon late binding so that the compiler can optimize."  If the computer didn't care, we wouldn't need to worry about optimization. But the computer definitely _does_ care, because it runs some kinds of code quickly and other kinds slowly.
+
+So if I had to restate the summary, I would say:
+
+* We both agree that _complete_ hiding of implementation details can be useful, and that people should know how to do it.
+* We disagree on how often they should be hidden; you think the answer is "most of the time", I think the answer is "only in specific circumstances"
+* We disagree on how important the computer is. I think we need to think about the computer most of the time, whereas you do not.
+
+And by "complete hiding" I mean the kind where the user literally cannot see the details - eg., not just a "private" section of something they can see but not use, but rather their code is compiled without any knowledge of the internals at all.
