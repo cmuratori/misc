@@ -500,7 +500,7 @@ However, this puts me in the position of invoking the hypothetical compiler that
 
 But given the current state of most compiler I think your argument has enough merit to warrant half-points.  ;-)
 
-Now let us say that we _want_ to protect our source code modules from recompilation and redeployment when low level details change; and that we are therefore going to use some kind of dependency inversion and late binding to provide that protection.  That means we are not going to let the compiler to see _everything_ but are intensionally _hiding_ information from the compiler thus preventing it from doing all the magic optimization it could do.
+Now let us say that we _want_ to protect our source code modules from recompilation and redeployment when low level details change; and that we are therefore going to use some kind of dependency inversion and late binding to provide that protection.  That means we are not going to let the compiler to see _everything_ but are intentionally _hiding_ information from the compiler thus preventing it from doing all the magic optimization it could do.
 
 What, in this case, is the advantage of run-time binding over link-time binding.  Why would we want the vtables, or the various other forms of dynamic dispatch that our languages offer?  
 
