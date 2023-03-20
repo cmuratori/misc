@@ -464,3 +464,68 @@ And the other important point here is that it is _continuous_ for the library au
 Nothing like this is possible in the hierarchy case: the library vendor would have to manually rewrite everything to eliminate the virtual call hierarchy first in order to make a change like this, which requires substantial effort, perhaps even a prohibitive effort in a large library. This is because the choice to base the design around virtual calls prevents compiler optimization across calls _everywhere_, even internal to the library, and there is no easy fix.
 
 So hopefully this explains the confusion?
+
+**Bob**: There's a lot to unpack in there.
+
+ * You and I are apparently using a different definition of the term *union*.  I was assuming you meant the traditional C `union` in which the data members share the same memory space.
+ * The code you presented is, in fact, the opaque pointer, linker bound solution I was alluding to above.  I said `void*` and you used `file*` with a forward declaration of the `struct file;`  So on that account I think we agree.
+ * You repeatedly used the term _hierarchy_.  I presume you were referring to _inheritance_ hierarchies.  However, using such hierarchies is not my position in this debate.  There are times when a hierarchy can be useful; but in general I prefer the interface/implementation approach.  In C++ that's a pure abstract class with no implementation (the interface), and a concrete class that implements that interface.  I suppose you could call that a two level hierarchy if you like; but I want to be clear that I'm not a big proponent of deep inheritance hierarchies. 
+
+I agree that if you use the C style .c/.h split and ensure that the only thing that appears in the .h files are _forward declarations_ without any definitions, then you can hide the implementation quite nicely.  That's because the old C style .c/.h split _is_ dependency inversion.  (indeed, it is a two level hierarchy) The .c file contains the low level implemenation, and it depends upon the high level interface in the .h file.  
+
+>_As an aside, this pleasant .c/.h split was corrupted by C++.  Stroustrup needed to know the size of objects in order to implement the `new` keyword.  So he forced member variable definitions into the .h files -- thus destroying encapsulation, forcing the horrible public/protected/private hack upon us, and making dependency inversion much more difficult.  (e.g. the PIMPL pattern.)_
+
+I also agree that the dependency inversion of the .c/.h split provides the protection I desire for compilation and deployment.  That protection comes from the fact that the linker does _late binding_ of the external references to the external definitions.  It's that late binding that allows the individual source files to be compiled independently.  Indeed, nowadays we use the old trick from the '60s of a linking loader to do all the linking at load time.  But that's another story.
+
+So far we are on the same page with the minor exception that I'm still not sure what you meant by `union`.  But let's let that pass for the time being.
+
+Perhaps this is a good time to reassess the differences and similarities in our position.  
+
+ * You are defending the .c/.h approach of inverting dependencies and using link-time late binding to protect against recompilation and redeployment.  
+ * I am defending the interface/implementation appraoch of inverting dependencies (which is essentially the .c/.h approach with a different syntax), and using run-time late binding (dynamic polymorphism), to protect against recompilation and deployment.  (As an aside, I actually use, and recommend, both approaches.  There are times when link-time binding is adequate and other times when runtime-binding is invaluable).
+
+Oddly, we seem to have replaced the operand/operation concept with the kind of late-binding we prefer.  It should be clear that the both operands and operations can be bound after compile time since both are really just functions that take arguments.  So the real issue between us is not operation vs operand, it is link-time binding vs. run-time binding.
+
+Your next assertion was that there was a difference in the amount of information that had to cross the boundary between the interface and the implementation.  Your argument was that both sides had to agree on the format of the vtable.  That's certainly true in C++.  Stroustrup created an indexed table of pointers to functions, and both sides must agree on the indeces for the method names _at compile time_.  I completely agree that programmers must ensure that the compilers used for the interface are compatible with the compilers used for the implementation.
+
+Other language systems use different approaches that don't require that index agreement at compile time.  Some use string matching at runtime.  Others could negotiate the indeces at link time.  There are a multitude of strategies to mitigate this.  However, the indeces of vtables is just the tip of a much larger information iceberg.
+
+If different languages, or even different vendors of the same language, are used across the interface/implementation boundary then they must agree upon a whole plethora of formats.  They must agree on endians, on the order of arguments and local variables within the stack frame, the size of data types, and the format of any try/catch markers on the stack.  The coordination of vtable indeces pales in comparison to all the other stuff they have to agree upon.
+
+Even if we stipulate that the language systems are identical across that boundary, the interface and implementation must agree on the names and signatures of the functions.  So, given these facts, I'm not disposed to put a lot of weight on your argument about the vtable format.
+
+Your argument that in the .c/.h case the user has the opportunity to gain optimizations by _compiling_ the modules together rather than using the late binding of the linker certainly has merit.  If you abadon _all_ late binding and give the compiler access to _all_ the source code, then the compiler can do quite a bit of magic.
+
+However, this puts me in the position of invoking the hypothetical compiler that can do all that magic if it sees all the source code that uses dynamic dispatch.  Dynamic dispatch certainly adds complexity to the problem; but there's nothing impossible about it.  And, indeed, there are language systems that try to make such improvements both at compile and runtime.  
+
+But given the current state of most compiler I think your argument has enough merit to warrant half-points.  ;-)
+
+Now let us say that we _want_ to protect our source code modules from recompilation and redeployment when low level details change; and that we are therefore going to use some kind of dependency inversion and late binding to provide that protection.  That means we are not going to let the compiler to see _everything_ but are intentionally _hiding_ information from the compiler thus preventing it from doing all the magic optimization it could do.
+
+What, in this case, is the advantage of run-time binding over link-time binding.  Why would we want the vtables, or the various other forms of dynamic dispatch that our languages offer?  
+
+Sometimes we don't.  That's why C++ gave us the `virtual` keyword.  That's why java has `static` functions.  Sometimes we just bloody don't want that dynamic dispatch sitting between the caller and the callee.
+
+But sometimes we do.  For exmaple: _Plugins_.
+
+Visual Studio provides dynamic dispatch of functionality within their product so that vendors like _Jetbrains_ can build plugins like _Resharper_.  The use of linking loaders means that we can link these kinds of plugins into our applications at runtime, and the dynamic dispatch means that the application can be entirely ignorant of the source code of the plugins.
+
+Related to plugins are frameworks like Rails.  Such frameworks could be statically linked if necessary; but otherwise convey similar advantages.  The framework need know nothing at all about the source code of the application that uses it.
+
+In both cases there is a profound asymmetry based on runtime bound dependency inversion.  The high level side is ignorant of the lower level side and _invulnerable_ to it's changes.  The low level side is dependent upon the high level side, and must react to changes made to the high level.   
+
+This vulnerability assymetry means that Microsoft is invulnerable to Jetbrains, but Jetbrains must react every time Microsoft makes a change to VS.  
+
+This same kind of vulnerability assymetry can be advantageous between, or even within, development teams.  We don't want the business rules to be vulnerable to the GUI or DB.  Indeed, we'd like the GUI and DB to be plugins to the business rules.  
+
+But I think that's enough for this go-around.  So let me summarize where I think we are.
+
+ * We both agree that dependency inversion and late binding are valuable for protecting systems against recompilation and redeployment.
+ * We both agree that link-time late binding can be used to an advantage.
+ * We both agree that it is sometimes necessary to abandon late binding so that the compiler can optimize.
+ * And I HOPE we both agree that there is a time and place for dynamic late binding; such as plugins and frameworks.
+ * And lastly, I hope we both agree that all these issues are human issues.  The computer does not care.
+
+
+ 
+ 
