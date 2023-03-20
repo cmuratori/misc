@@ -464,3 +464,17 @@ And the other important point here is that it is _continuous_ for the library au
 Nothing like this is possible in the hierarchy case: the library vendor would have to manually rewrite everything to eliminate the virtual call hierarchy first in order to make a change like this, which requires substantial effort, perhaps even a prohibitive effort in a large library. This is because the choice to base the design around virtual calls prevents compiler optimization across calls _everywhere_, even internal to the library, and there is no easy fix.
 
 So hopefully this explains the confusion?
+
+**Bob**: There's a lot to unpack in there.
+
+ * You and I are apparently using a different definition of the term *union*.  I was assuming you meant the traditional C `union` in which the data members share the same space.
+ * The code you presented is, in fact, the opaque pointer, linker bound solution I was alluding to above.  I said `void*` and you used `file*` with a forward declaration of the `struct file;`  So on that account I think we agree.
+ * You repeatedly used the term _hierarchy_.  I presume you were referring to _inheritance_ hierarchies.  However, using such hierarchies is not my position in this debate.  There are times when a hierarchy can be useful; but in general I prefer the interface/implementation approach.  In C++ that's a pure abstract class with no implementation (the interface), and a concrete class that implements that interface.  I suppose you could call that a two level hierarchy if you like; but I want to be clear that I'm not a big proponent of deep hierarchies.  But perhaps this is going a little deep into the weeds.
+
+I agree that if you use the old C style .c/.h split and ensure that the only thing that appears in the .h files are _forward declarations_ without any definitions, then you can hide the implementation quite nicely.  That's because the old C style .c/.h split took advantage of dependency inversion.  The .c file contains the low level implemenation, and it depends upon the high level abstraction in the .h file.  
+
+>_As an aside, this pleasant split was corrupted by C++.  Stroustrup needed to know the size of objects in order to implement the `new` keyword.  So he forced member variable definitions into the .h files -- thus destroying encapsulation and forcing the horrible public/protected/private hack upon us._
+
+
+ 
+ 
