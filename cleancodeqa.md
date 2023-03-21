@@ -562,3 +562,33 @@ So if I had to restate the summary, I would say:
 * We disagree on how important the computer is. I think we need to think about the computer most of the time, whereas you do not.
 
 And by "complete hiding" I mean the kind where the user literally cannot see the details - eg., not just a "private" section of something they can see but not use, but rather their code is compiled without any knowledge of the internals at all.
+
+**Bob**:  It seems we have come a long way and wound up at an agreement on just about everything other than individual preference; which is likely driven by the different environments we live in.
+
+Thank you for the `union` clarification.  I understand it now.  
+
+I'll quibble with you a bit on the distinction between operand vs. operation, but I don't think the quibble is particularly important.  In the end it's all `f(x)` regardless of how you spell it.
+
+As for the "human" issue.  Performance is a human issue.  The computer doesn't care how fast or slow an algorithm runs.  But I think that horse is dead now.
+
+So, given that we understand each other so well, let's talk about this issue of preference driven by environment.
+
+In my work I don't care about nanoseconds.  I almost never care about microseconds.  I sometimes care about milliseconds.  Therefore I make the software engineering tradeoff towards _programmer convenience_, and long term readability and maintainability.  This means that I don't want to think about the hardware.  I don't want to know about Ln caches, or pipelining, or SIMD, or even how many cores there are in my processor.  I want all that abstracted away from me, and I am willing to spend billions of computer cycles to attain that abstraction and separation.  My concern is _programmer cycles_ not machine cycles.
+
+I have, in the past, worn the other shoes.  There was a time in my career when microseconds had to be conserved, when I had to meet submillisecond deadlines, and I counted and conserved cycles as carefully as Ebenzer Scrooge.  So I think I understand your concern fairly well.  
+
+That is why I generally agreed with your video that kicked this whole discussion off but continue to disagree with that video's general conclusion that Clean Code is bad.
+
+Let's set aside, for a moment, that the definition of "Clean Code" that you used in that video did not always align with the recommendations I made in my _Clean Code_ book.  The point is still valid.  Programmers who use the techniques that I recommended in that book _will be trading computer cycles for programmer cycles_.  And that's a good thing in most of the software teams and organizations that I work with.
+
+I tip my hat, however, to your valid concern that myopically focussing on programmer cycles and utterly ignoring computer cycles can lead to horrifically inefficient systems.  None of us want that; just as none of us want to work in a world where we focus solely on computer cycles to the detriment of programmer productivity.
+
+***
+
+There are a gazillion other things we could go on to discuss.  We could argue about the dependency structure of switch statements vs polyomorphism.  We could talk about the best ways to cross architectural boundaries, and when link-time binding is better than run-time binding.  But, honestly, I think we have restored balance to _The Force_ and have achieved our primary goals. 
+
+So unless you have something you think is critically important to address, I recommend that we call an end to this dialog.
+
+I'd like to thank you for a very stimulating, and civil, discussion.  I look forward to other such discussions in the future.  
+
+
