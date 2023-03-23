@@ -94,6 +94,7 @@ First we need to acknowledge that since the 90s there has been a very large emph
 In the if/switch case, what does the OS look like?  Each of the five interface functions mentioned above probably has a switch statement in it.  It looks something like this in C(ish) code:
 
 `file read.c`
+
 	#include "devids.h"
 	#include "console.h"
 	#include "paper_tape.h"
