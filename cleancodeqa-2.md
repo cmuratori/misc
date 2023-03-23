@@ -146,3 +146,23 @@ In that video you told the story of how you tried, and failed, to create a reusa
 Your experience is eerily similar to one I had in the early '90s.  My team and I had 36 applications to write in C++.  We had limited time.  The applications had many similarities and we pitched a reusable framework to our customer.  We had no idea how hard this was going to be.  Our first attempt at this framework was developed in concert with ONE of the 36 applications.  It tooks us a very long time to create.  When we were done we tried to reuse that framework in four more applications, and failed horribly.  So we adopted a new strategy.  We stripped that framework down and rebuilt it; but only with elements that were used in all four of the applications we were writing.  Again, it took a long time, but when we started the next four applications, the framework fit like a glove; and we finished all 36 well in advance of our deadline.
 
 We learned a lot from that experience.  That learning is one of the sources of the SOLID principles, and the Clean Code strategies that I recommend to others. 
+
+**CASEY**: I apologize for trying to be very specific here, but, I really want to actually get the exact proposal, and it wasn't really clear what it was. Could you tell me _exactly_ what the OS interface looks like and how it's implemented? You said _"I guess that depends a lot on the language and the application"_, but my understanding was that we were talking about the _OS_ side. Because obviously the application does not implement the raw device, so it doesn't need any switch statements or inheritance hierarchies or anything else. The OS and/or the driver implements the raw device, and it is expected to work across a wide range of applications and languages. So it can't "depend on the application or language" per se, it has to work with all of them. If you just mean it depends on what language the OS was written in, I assume it would be C/C++ because that's what Linux and Windows are written in at that layer, and I was hoping for this to be a real-world example.
+
+In case it is not clear what I'm asking, we're talking about switch statements vs. inheritance hierarchies for implementing the layer from the OS down to the hardware. You said you thought this was a good example for where programmer cycles would be saved using inheritance vs. using switch statements. I assumed this meant that you believed having a particular inheritance hierarchy structure at the OS level would save either a) the OS programmers, b) the hardware vendors, or c) both, "programmer cycles", possibly at the expensve of CPU cycles, over the course of maintaining this OS. In my head, I don't see how that could possibly be the case vs. an enum/flags/switch/if approach. So I was hoping for an answer that spelled it out for me.
+
+So what is the actual series of steps that happens here where the programmer cycles are saved? And I was hoping to then ask some hypotheticals, like about maintenance that would have to occur (adding a new device driver, etc.) Like, we start with the basic implemenation that they maybe had when they ship the first time, then we imagine the boss coming down and saying "now we need to support X", and then you can show me how it saves programmer cycles in that case, etc.
+
+I'm assuming there is something like this somewhere?
+
+```
+class raw_device
+{
+public:
+	virtual bool read(size_t Size, void *Memory) = 0;
+	virtual bool write(size_t Size, void *Memory) = 0;
+	// Is "close" here? "open"? A constructor or destructor? I'm not sure what you would advise.
+};
+```
+
+Could you basically write what the base class is, and then how wiring works to go from the "getchar()"/"putchar()" example on the app side to the driver implementation of the derived class? That would be very helpful as a starting point so I can understand what you're actually recommending.
