@@ -72,3 +72,77 @@ So perhaps we imagine a real modern operating system - say Microsoft Windows or 
 * Allow the user to write n bytes from a user-provided piece of memory to a specific offset on the device
 
 What does this interface look like if designed properly according to your design principles?
+
+**Bob**:  I guess that depends a lot on the language and the application. Java can read bytes from an `InputStream`.  In clojure I'd likely do something simple like slurp in the whole file and navigate in memory to the bytes I need.  But I think you are asking a different question.  I think you want me to continue the story I told about the '70s and the Unix style IO interface.  
+
+I'm not sure it's possible to improve upon that at the lowest levels.  The vtable of `open`, `close`, `read`, `write`, and `seek` are pretty good.  This scheme allows me to write the following program to copy one device to another without knowing what the device is:
+
+	void copy() {
+	  int c;
+  	  while((c=getchar()) != EOF)
+  		putchar(c)
+	}
+
+Where `getchar` and `putchar` are helper functions that call `read` and `write` on `stdin` and `stdout` repspectively.  If you compare this code to the kind of code that we had to write in the '60s to do roughly the same thing, the savings in programmer cycles is profound.
+
+Does the above code depend upon dynamic polymorphism?  In UNIX it is certainly implemented that way.  But, as you pointed out earlier, it would be possible to create an OS interface that used link-time binding instead of run-time binding to accomplish the same thing -- with the exception that the IO drivers could not be dynamically loaded.
+
+>_I could stop here and simply say that there are times when the link-time approach is better than the run-time approach; and that's true.  However, you said that enum/flags and if/switches are better in most cases. So let's examine that._
+
+First we need to acknowledge that since the 90s there has been a very large emphasis on dynamic linking.  The creation of DLLs, Jars, and Shared Libraries moved the linker into the loader.  The reason this was considered valuable was so that we could build our applications using a plugin architecture.  You may remember `ActiveX` and DCOM, all that stuff from back then.  It ought to be clear that link-time binding that uses `if/switch` below the interface _impedes_ the plugin strategy; but let me explain why.
+
+In the if/switch case, what does the OS look like?  Each of the five interface functions mentioned above probably has a switch statement in it.  It looks something like this in C(ish) code:
+
+`file read.c`
+
+	#include "devids.h"
+	#include "console.h"
+	#include "paper_tape.h"
+	#include "..."
+	#include "..."
+	#include "..."
+	#include "..."
+	#include "..."
+	void read(file* f, char* buf, int n) {
+		switch(f->id) {
+			case CONSOLE: read_console(f, buf, n); break;
+			case PAPER_TAPE_READER: read_paper_tape(f, buf n); break;
+			case...
+			case...
+			case...
+			case...
+			case...
+		}
+	}
+	
+This is a fairly ugly source file.  The more devices there are the bigger this file grows both in terms of `#include` and `case` statements.  The number of outgoing dependencies also grows, so this module has a very large _fan-out_.  And, remember, there are five of these files.
+
+Whenever a new device is added, all five files must be updated with the new device.  Whenever any of the `#include`d header files change, all five files must be recompiled.
+
+Where are the device IDs like `CONSOLE` and `PAPER_TAPE_READER` defined?  They are `#define` macros in the `devids.h` file.  Whenever a new device is added to the OS, the `devids.h` file must be modified to add the new `#define` macro.  And, of course, any source file in the OS that `#include`s `devids.h` will have to be recompiled.
+
+What this means for the plugin architechture is that you can't simply write the plugin.  You must instead modify, and increase the _fan-out_ of, a large and growing source module, and somehow link that in with your new plugin.  It's possible to do this with DLLs/Jars/SharedLibs, but it's not fun.
+
+It also introduces an administration headache.  In a multiple team environment, you've got to keep control over those switch statements.  You don't want to create _DLL-HELL_ by allowing multiple teams to have their own versions.  
+
+---
+
+The vtable approach used by UNIX changes things around significantly.  The IO drivers can be loaded at any time.  When an IO device is selected the five functions are simply loaded into the `file`'s vtable.  There is no growing source file that steadily increases in _fan-out_.  There is no `devids.h` file to spur extra recompiles.  When new devices are added, nothing else has to be recompiled or relinked.  The DLL is simply loaded and registered into the set of devices.
+
+---
+
+Now the problems I've just outlined are quite common in modern applications.  It is not at all uncommon to see switch statement scattered throughout the body of the code -- all with the same cases but with different targets.  There can be a lot more than five; and they reproduce like gerbils.  
+
+But this is likely a good place to pause and say that I think there is a time and place for both link-time and run-time binding.  There is a time and place for both if/switch and dynamic polymorphism dispatch.  
+
+I think it is fair to say that I lean more towards the runtime polymorphism side of that divide.  But then I don't work in constrained environments.  Memory and cycles don't mean a lot to me anymore.  What matters most to me is source file organization and the minimization of the impact of source code dependencies.
+
+---
+
+Lastly, I just watched a video you did some time back on the principles of Reuse.  https://youtu.be/ZQ5_u8Lgvyk.  This is a great video.  It is densely packed with very good information that you presented very competently.  
+
+In that video you told the story of how you tried, and failed, to create a reusable framework.  You said that failure, and the subsequent more successful attempts, caused you to learn a lot.  That learning was the source of the principles you presented.
+
+Your experience is eerily similar to one I had in the early '90s.  My team and I had 36 applications to write in C++.  We had limited time.  The applications had many similarities and we pitched a reusable framework to our customer.  We had no idea how hard this was going to be.  Our first attempt at this framework was developed in concert with ONE of the 36 applications.  It tooks us a very long time to create.  When we were done we tried to reuse that framework in four more applications, and failed horribly.  So we adopted a new strategy.  We stripped that framework down and rebuilt it; but only with elements that were used in all four of the applications we were writing.  Again, it took a long time, but when we started the next four applications, the framework fit like a glove; and we finished all 36 well in advance of our deadline.
+
+We learned a lot from that experience.  That learning is one of the sources of the SOLID principles, and the Clean Code strategies that I recommend to others. 
