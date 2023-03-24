@@ -217,7 +217,7 @@ I also write the implementation in a .cc file `new_device.cc`:
 	
 These two source files have a direct _fan-out_ of 1 and a transitive _fan-out_ of 2.  
 
-Now since we are presuming, for the sake of argument, that dynamic loading is not a factor, let presume that we need some static module to create the instances of our IO drivers and load them into a map of io devices keyed by their names.  My STL knowledge is a bit rusty so I'll make up a `map` class for this example.
+Now we need a module to create the instances of our IO drivers and load them into a map of io devices keyed by their names.  My STL knowledge is a bit rusty so I'll make up a `map` class for this example.
 
 	  io_driver_loader.cc
 	  #include "new_device.h"
@@ -232,11 +232,11 @@ Now since we are presuming, for the sake of argument, that dynamic loading is no
 		  ...
 	  }
 	  
-I'm not compiling any of this so there likely some syntax errors here and there that I hope you can forgive.
+>_I'm not compiling any of this so there are likely some syntax errors here and there that I hope you can forgive._
 
 This last module has a _fan-out_ of N where N is the number of devices.  
 
-Whenever a new IO device must be added the new .h and .cc file must be created.  And the `io_driver_loader.cc` file must be modified.  They'll all have to be recompiled and relinked.  (again, assuming no dynamic linking and loading).  
+Whenever a new IO device must be added the new .h and .cc file must be created.  And the `io_driver_loader.cc` file must be modified.  They'll all have to be recompiled and relinked.  
 
 So let's count the programmer cycles in order to add a new device.
 
