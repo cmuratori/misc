@@ -166,3 +166,105 @@ public:
 ```
 
 Could you basically write what the base class is, and then how wiring works to go from the "getchar()"/"putchar()" example on the app side to the driver implementation of the derived class? That would be very helpful as a starting point so I can understand what you're actually recommending.
+
+**Bob**: Woah, I had to update my RSA key for github.com before I could pull this.  See https://github.blog/2023-03-23-we-updated-our-rsa-ssh-host-key/
+
+OK, so let's assume that we are writing a new OS.  And let's say that we are _not_ planning to hot-load the io drivers dynamically at runtime.  Instead we are going to statically link the OS.  Thus the only difference that we will consider between the switch and polymorphism solutions is programmer cycles. 
+
+In my previous response I showed what I thought the `switch` statement implementation might look like.  
+So here's what I think the dynamic polymorphism example might look like.
+
+If we were writing this in C++ then there would likely be a base class defined as you showed above.
+	
+	#include "file.h"
+	class raw_device {
+	public: 
+		virtual file* open(char* name) = 0; // some other args here too elided for simplicity.
+		virtual void close(file* f) = 0;
+		virtual void read(file* f, size_t n, char* buf) = 0;
+		virtual void write(file* f, size_t n, char* buf) = 0;
+		virtual void seek(file* f, int n) = 0;
+		virtual char* get_name() = 0; // return the name of this device.
+	}
+
+>_Forgive my archaic C++ style, it's been 20+ years since I wrote any serious C++ or C._
+
+In this example the `raw_device` is really nothing more than a jump table.  It holds no data or state.  The `file` data structure holds the state of the currently open session. The `raw_device.h` file has a source code dependency on `file.h`; and will never have another source code dependency on anything else.  It has a _fan-out_ of 1.  
+
+Now I'd like to add an IO driver.  So I write the following code in `new_device.h`
+
+	#include "raw_device.h"
+	class new_device : public raw_device {
+	public: 
+		virtual file* open(char* name);
+		virtual void close(file* f);
+		virtual void read(file* f, size_t n, char* buf);
+		virtual void write(file* f, size_t n, char* buf);
+		virtual void seek(file* f, int n);
+		virtual void get_name();
+	}
+	
+I also write the implementation in a .cc file `new_device.cc`:
+
+	#include "new_device.h"
+	
+	file* new_device::open(char* name) {...}
+	void new_device::close(file* f) {...}
+	void new_device::read(file* f, size_t n, char* buf) {...}
+	void new_device::write(file* f, size_t n, char* buf) {...}
+	void new_device::seek(file* f int n) {...}
+	void new_device::get_name() {return "new_device";}
+	
+These two source files have a direct _fan-out_ of 1 and a transitive _fan-out_ of 2.  
+
+Now we need a module to create the instances of our IO drivers and load them into a map of io devices keyed by their names.  My STL knowledge is a bit rusty so I'll make up a `map` class for this example.
+
+	  io_driver_loader.cc
+	  #include "new_device.h"
+	  #include "new_device2.h"
+	  #include "new_device3.h"
+	  ...
+	  
+	  void load_devices(device_map& map) {
+		  map.add(new new_device()); // map.add uses get_name to associate the device with the name.
+		  map.add(new new_device2());
+		  map.add(new new_device3());
+		  ...
+	  }
+	  
+>_I'm not compiling any of this so there are likely some syntax errors here and there that I hope you can forgive._
+
+This last module has a _fan-out_ of N where N is the number of devices.  
+
+Whenever a new IO device must be added the new .h and .cc file must be created.  And the `io_driver_loader.cc` file must be modified.  They'll all have to be recompiled and relinked.  
+
+So let's count the programmer cycles in order to add a new device.
+
+  * In the dynamic polymorpism case:
+    * create `new_device_4.h`
+    * create `new_device_4.cc`
+    * modify `io_driver_loader.cc`
+	* recompile and relink 3 files.
+
+  * In the switch statement case:
+    * create `new_device_4.h` forward declarations of the five functions.
+	* create `new_device_4.cc` implementations of the five functions.
+	* modify five switch statements, one for each of the functions, possibly in five different files.
+	* modify `devids.h` to add the new `#define` macro for the device.
+	* recompile and relink between 4 and 8 files, and all files that depend upon `devids.h`.
+
+It should be clear that if we consider dynamic loading, then the `io_driver_loader.cc` file becomes something entirely different, and does not require modification when new IO devices are added; whereas the switch solution remains unchanged.
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
