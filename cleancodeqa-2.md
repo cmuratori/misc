@@ -255,16 +255,38 @@ So let's count the programmer cycles in order to add a new device.
 
 It should be clear that if we consider dynamic loading, then the `io_driver_loader.cc` file becomes something entirely different, and does not require modification when new IO devices are added; whereas the switch solution remains unchanged.
 
+**CASEY**: Well, hold on, since I'm the switch statement proponent, I get to write the switch version :) But before we do that, I have a couple questions.
 
+First, this is a raw device, so we don't actually need a file (I was trying to give us the simplest case so there would be as few details as possible!). So following your example I assume the base class in the DDK would be just:
 
+```
+	class raw_device {
+	public: 
+		virtual void read(size_t offset, size_t n, char* buf) = 0;
+		virtual void write(size_t offset, size_t n, char* buf) = 0;
+		virtual char* get_name() = 0; // return the name of this device.
+	}
+```
 
+and the implementation in the vendor's driver would be
 
+```
+	#include "raw_device.h" // from the DDK
+	class new_device : public raw_device {
+	public: 
+		virtual void read(size_t offset, size_t n, char* buf);
+		virtual void write(size_t offset, size_t n, char* buf);
+		virtual void get_name();
+	}
+```
 
-  
+Also, separate from the file handle part, I assume whenever one of these devices is used, it is looked up via the device map like this:
 
+```
+raw_device *find_raw_device(char *name) {
+		raw_device *device = global_device_map[name];
+		return device;
+	  }
+```
 
-
-
-
-
-
+Is that correct? If you think it's important that the example include actual file handles, we can still do that, but if we do, I have other questions about the implementation.
