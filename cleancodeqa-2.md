@@ -295,4 +295,6 @@ Is that correct? If you think it's important that the example include actual fil
  * Regarding the switch:  Sure, no problem.   
  * Regarding the file: My intent was that the file was an opaque pointer to _something_ that held the state of the session.  If you'd rather not have it, that's fine with me.  However, that reduces the number of operations from 5 down to 2 and impacts the count of programmer cycles.  But let's see where this goes.  
 
+**CASEY**: We can definitely keep file in there if you'd like. It's your choice. I just figured I'm about to ask a bunch of questions about how you modify the design to accomodate OS and device upgrades, and it seemed easier if it was the minimal function set to start with (we can add more, like OSes have to do from time to time). But if you'd like to have file in there as well, we can add it back in now. I'd just have some questions about it if it's still going to be in there.
 
+Assuming we _don't_ add it back in, my first question would be, what does the user-side version of this look like? In other words, I assume what you've designed here is in the OS and driver internals. What API does the application programmer use to interact with a raw_device?
