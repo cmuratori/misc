@@ -290,3 +290,9 @@ raw_device *find_raw_device(char *name) {
 ```
 
 Is that correct? If you think it's important that the example include actual file handles, we can still do that, but if we do, I have other questions about the implementation.
+
+**Bob**:  
+ * Regarding the switch:  Sure, no problem.   
+ * Regarding the file: My intent was that the file was an opaque pointer to _something_ that held the state of the session.  If you'd rather not have it, that's fine with me.  However, that reduces the number of operations from 5 down to 2 and impacts the count of programmer cycles.  But let's see where this goes.  
+
+
