@@ -169,11 +169,10 @@ Could you basically write what the base class is, and then how wiring works to g
 
 **Bob**: Woah, I had to update my RSA key for github.com before I could pull this.  See https://github.blog/2023-03-23-we-updated-our-rsa-ssh-host-key/
 
-OK, so let's assume that we are writing a new OS.  And let's say that we want this new OS to be able to accept new IO drivers without having to be relinked into a new executable.  That means we'll have to use dynamic loading of DLLs or shared libraries to bring those new drivers into the OS.
+OK, so let's assume that we are writing a new OS.  And let's say that we are _not_ planning to hot-load the io drivers dynamically at runtime.  Instead we are going to statically link the OS.  Thus the only difference that we will consider between the switch and polymorphism solutions is programmer cycles. 
 
-In my previous response I showed what I thought the `switch` statement implementation would look like.  That implementation would likely not work well given the dynamic loading requirements.  But let's assume, for the sake of argument, that it would; and that the only difference between the `switch` and `polymorphism` cases were programmer cycles.
-
-What would the dynamic polymorism interface look like?
+In my previous response I showed what I thought the `switch` statement implementation might look like.  
+So here's what I think the dynamic polymorphism example might look like.
 
 If we were writing this in C++ then there would likely be a base class defined as you showed above.
 	
