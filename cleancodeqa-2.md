@@ -327,4 +327,4 @@ Or perhaps we should focus on the embedded case where the OS and the app are lin
 
 OR -- perhaps we've gone down a rathole and it's time to cut to the chase.  See `programmer-cycles-vs-machine-cycles.md` file that I just created in this repository.  
 
-I'm afraid my time is not unlimitted, so if you've got a different point to make, then let's get to it without further delay.  Otherwise let's call it a day.
+As much as I've enjoyed this discussion, and as much as I've come to appreciate your knowledge and experience, I'm coming to the end of the time I can give to it.  So if our current thread is headed somewhere specific then let's get there without further delay. 
