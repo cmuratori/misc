@@ -322,3 +322,7 @@ This is just one possible set of scenarios of course.  Others might involve expo
 Having written all this, I fear we are getting fairly far afield from the actual topic, which is programmer-cycles vs. machine-cycles.  The example I presented was on the OS side only.  It seems to me that we'd be better off investigating whether that approach saves programmer cycles for the OS developers rather than worrying about the app developers on the other side of the OS boundary.  
 
 Or perhaps we should focus on the embedded case where the OS and the app are linked together into a single executable.  In that case the OS developers and the app developers are harder to separate since the app developers will likely need to write their own device drivers.
+
+---
+
+OR -- perhaps we've gone down a rathole in our mutual attempts to avoid falling into a trap laid by the other.  So take a look at the `programmer-cycles-vs-machine-cycles.md` file that I just created in this repository.  
