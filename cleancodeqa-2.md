@@ -298,3 +298,27 @@ Is that correct? If you think it's important that the example include actual fil
 **CASEY**: We can definitely keep file in there if you'd like. It's your choice. I just figured I'm about to ask a bunch of questions about how you modify the design to accomodate OS and device upgrades, and it seemed easier if it was the minimal function set to start with (we can add more, like OSes have to do from time to time). But if you'd like to have file in there as well, we can add it back in now. I'd just have some questions about it if it's still going to be in there.
 
 Assuming we _don't_ add it back in, my first question would be, what does the user-side version of this look like? In other words, I assume what you've designed here is in the OS and driver internals. What API does the application programmer use to interact with a raw_device?
+
+**Bob**:
+A lot depends in the kind of OS we are using.  We could be talking about a big fat memory mapped OS like MACOS, or a little embedded RTOS.  So my description below will try to cover the range without getting too tangled.
+
+Leaving the `file` out of things for the time being, and presuming the `class raw_device` that you presented above lives on the OS side, then the lowest level user API would likely be a linkable library that provides access to primitive delegator functions: `read` and `write`.  These functions would likely have signatures like:
+
+ * `read(char* name, size_t offset, size_t n, char* buf);`
+ * `write(char* name, size_t offset, size_t n, char* buf);`
+ 
+These functions delegate to implementations that exist in the OS.  These implemementations use the `find_raw_device` function that you suggested to delegate to the `read` and `write` functions of the selected instance of `raw_device`. 
+
+Some means must be devised to implement the delegation across the OS boundary.  Some OSes might use special _interrupt_ or _system-call_ hardware instructions that the OS has provided vectors for.  Other OSes might create a vector table in some known part of memory.  Still others might simply declare the target functions to exist in a portion of memory that is memory mapped to a constant address.  
+
+Another possibility would be to avoid the delegation altogether by making the entire IO subsystem of the OS a linkable library.  (We see this approach used in embedded OSes). In this case the low level APIs would use the `class raw_device` and the `find_raw_device` function without the imposition of the `read` and `write` delegator functions and implementations I described above.  
+ 
+Above that primitive level of the API would be functions that are designed to be linked into the app, and that provide slightly higher level functionality.  For example, a function like `getchar` would be written in terms of calls to `read` (or in the embedded case direct calls to the `read` method of `raw_device`) and would use some means (such as environment variables) to translate `stdin` to the device name.
+
+This is just one possible set of scenarios of course.  Others might involve exporting the vtables of the instances of `raw_device` for the current `stdin` and `stdout` devices so that they can be directly called by the application.  Indeed, this is close-ish to the approach used by some UNIX variants.
+
+---
+
+Having written all this, I fear we are getting fairly far afield from the actual topic, which is programmer-cycles vs. machine-cycles.  The example I presented was on the OS side only.  It seems to me that we'd be better off investigating whether that approach saves programmer cycles for the OS developers rather than worrying about the app developers on the other side of the OS boundary.  
+
+Or perhaps we should focus on the embedded case where the OS and the app are linked together into a single executable.  In that case the OS developers and the app developers are harder to separate since the app developers will likely need to write their own device drivers.
