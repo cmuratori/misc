@@ -328,3 +328,175 @@ Or perhaps we should focus on the embedded case where the OS and the app are lin
 OR -- perhaps we've gone down a rathole and it's time to cut to the chase.  See `programmer-cycles-vs-machine-cycles.md` file that I just created in this repository.  
 
 As much as I've enjoyed this discussion, and as much as I've come to appreciate your knowledge and experience, I'm coming to the end of the time I can give to it.  So if our current thread is headed somewhere specific then let's get there without further delay. 
+
+**CASEY**: I'm not even talking about machine-cycles, I was _just_ focusing on programmer-cycles. But I understand your design now, which I will summarize here for clarity.
+
+First, every operation is represented by a function, 2+d times (once in userland, once in the kernel, then in d drivers). So for o operations, we have (2+d)\*o pieces of code, generally speaking.
+
+On the application side we have:
+
+```
+int read(char* name, size_t offset, size_t n, char* buf);
+int write(char* name, size_t offset, size_t n, char* buf);
+```
+
+These operate in userland and then they thunk down to ring-0 versions that look like (if I understand correctly):
+
+```
+int read_internal(char* name, size_t offset, size_t n, char* buf)
+{
+	// Translating addresses and checking bounds goes here, for "name" and "buf"
+
+	int Error = DEVICE_NOT_FOUND;
+	raw_device *Dev = find_device(name);
+	if(Dev)
+	{
+		Dev->read(offset, n, buf);
+	}
+	
+	return Error;
+}
+```
+
+with raw_device being this:
+
+```
+	class raw_device {
+	public: 
+		virtual void read(size_t offset, size_t n, char* buf) = 0;
+		virtual void write(size_t offset, size_t n, char* buf) = 0;
+		virtual char* get_name() = 0; // return the name of this device.
+	}
+```
+
+So, for comparison, let's look at what an enumerant-based solution would be. In this scenario, there are no practical limits I can think of in breaking things down into numbers, so I would do it for literally everything (the devices _and_ the operations):
+
+```
+// Some people prefer namespaces and such, so if that is your thing, imagine these are wrapped for naming however you prefer
+
+enum raw_device_operation : u32
+{
+	RIO_none,
+	
+	RIO_read,
+	RIO_write,
+	RIO_get_name,
+	
+	RIO_private = 0x80000000, // Completely optional - I would do it, but then again, maybe I wouldn't if these drivers are ring-0 and we don't trust them much?
+};
+
+struct raw_device_id
+{
+	u32 ID;
+};
+
+struct raw_device_request
+{
+	size_t Offset;
+	size_t Size;
+	void *Buffer;
+	raw_device_operation OP;
+	raw_device_id Device;
+	
+	// Anything in an OS like this I typically want to pad to cache line size, in case there is multithreading going on:
+	u64 Reserved64[4];
+};
+
+strcut raw_device_result
+{
+	u32 error_code;
+	
+	// Same as above - maybe this is overkill, but, I don't like cache-unaligned things, so, force of habit.
+	u32 Reserved32;
+	u64 Reserved64[7];
+};
+```
+
+Now, I don't like vtables or language-specific object stuff pretty much anywhere, because I find it harder to control, so I would prefer
+
+```
+typedef void raw_device_handler(u32 Instance, raw_device_request *Packet, raw_device_result *Result);
+struct raw_device
+{
+	raw_device_handler *Handler;
+};
+```
+
+instead of the class version. But the only real reason I have to write that is, of course, because C++ is crappy and you can't say "I would like this class to contain function pointers, instead of a pointer to a table of function pointers, please." Otherwise, I wouldn't have a problem with the class version. So, although I would rather have the direct pointer version in practice, for purposes of this discussion (since we only care about programmer cycles right now), you can ignore my raw_device struct and we can just assume that it is written in class form like yours since I can't think of any programmer-cycles benefit to my version in this case:
+
+```
+class raw_device
+{
+public:
+	void Handler(raw_device_request *Packet, raw_device_result *Result);
+};
+```
+
+Since the user never sees a raw_device - they would just be using the 32-bit raw_device_id handle - leaving this as a class is fine.
+
+When someone implements a device driver, they really just implement one function:
+
+```
+void raw_device::Handler(raw_device_request *Packet, raw_device_result *Result)
+{
+	switch(Packet->Op)
+	{
+		case RIO_read:
+		// etc.
+		
+		case RIO_write:
+		// etc.
+		
+		case RIO_get_name:
+		// etc.
+		
+		default:
+		// write error Result
+	}
+}
+```
+
+Obviously, the user-side version of this can be the same as yours:
+
+```
+int read(char* name, size_t offset, size_t n, char* buf);
+int write(char* name, size_t offset, size_t n, char* buf);
+```
+
+However, I might recommend that it be more like:
+
+```
+raw_device_id lookup_device(char* name);
+int read(raw_device_id device, size_t offset, size_t n, char* buf);
+int write(raw_device_id device, size_t offset, size_t n, char* buf);
+```
+
+in _either_ case, but that is largely irrelevant, because that's solely about the lookup to map to a specific device, and can be used with either design.
+
+Anyway, over the course of the development of the OS, I think this implementation _saves_ programmer cycles, potentially a lot of them, compared to the one I understand to be favored by the "Clean Code" method (which is also the one you wrote above). Again, in my understanding, the reason that yours looks the way it looks is specifically because of two design ideas that you mention often in books and in lectures:
+
+* You favor having one class for each type of thing (in this case a driver), with one virtual member function per operation that the thing does (in this case read, write, and get_name)
+* Operation permutations are not supposed to pass through functions - so passing an enum to a function that says what to do is bad, you should have one function per thing that gets done. I've seen this mentioned multiple times - not just for switch statements, but also when you say functions with "if" statements on function parameters in them, that modifies what the function does, you're supposed to rewrite that as two functions.
+
+In my experience, these two things cost a lot of programmer cycles. I prefer to collapse things into functions with parameters when possible, because it reduces the total number of things that the programmer has to think about, and reduces the number of files, lines of code, and data permutations they have to consider. It allows functions to "pass through" information about what is happening without knowing what it is. Again, I tend to think of this as "operation-primal", because instead of focusing on making your _types_ polymorphic, you're making your _functions_ polymorphic.
+
+I don't know if "abstracting file IO" is the best example to pick, but it was the first one you brought up, and it _happens_ to contrast the two designs enough in my opinion, so it works for me. Here's why I think an enum-based design saves the programmer(s) cycles:
+
+* In most systems, we do not know all the functions that we are going to do ahead of time. When operating across a hard boundary like a driver, using operation codes instead of virtual function calls allows us to add functions dynamically without recompiling all of our drivers. If we want, for example, to add a new function like "trim" (such as what happened with real IO protocols when SSDs happened), if we are just passing opcodes to a driver, we don't have to recompile _anything_. All the old drivers just ignore the code, whereas the new drivers act on it, which is what we want. In the class case, either all the drivers have to be recompiled, or we have to write a utility class which stubs the new function, and wrap all the old drivers in that utility class. If we don't do this, the vtables for the old drivers will all be the wrong size, so we can't use them.
+* In any modern system, multithreading is a concern, but this is especially true for an operating system. Having the protocol be structure-based, with an operation code, allows us to trivially buffer operations in things like io rings or other intermediaries _without writing any new code_. The entire system remains identical, and we need only add the new buffer logic. In the class system, we don't have any way to represent function operations with data, so wse must _introduce_ a data format for storing the calls - which of course will end up looking basically like the code for the non-class version, so you end up having to write my version _as well as_ the class version. This, by the way, seems to happen in almost _all_ OOP systems I see, because eventually they need to serialize or something similar, and so they have to write my version _as well as_ their version, but they don't seem to realize how much time they're wasting this way!
+* If at some point we decide that users should be able to do multithreaded/bulk IO ops, with the enum version there are _zero_ changes to the internals and the drivers. All we do is add whatever user-land interface we want for this (presumably a circular buffer they write to), and everything "just works", with no translation necessary because the internals already worked on data instead of vtables/function calls anyway.
+* If we would like to allow 3rd parties to have private communication channels for their devices, where user-level code can do IO ops that are only defined on those devices, there is no way to do this if we stick with the idea that each operation has to be represented by its own virtual function. It requires a complete side-channel implementation that has to be created specially and deployed by each vendor separately, because we have no idea how many functions each device will need or what they will be called. With the enum version, it's trivial. Just reserve half the opcode range for private stuff, and let anything in that range pass through to the device. Now the vendor ships an enum table to the end users, or an SDK with function calls that write those enums for them if you prefer, and that's it. Whether or not you'd actually _want_ to do this in an OS is questionable, because you're trusting the driver more here, but the point is the architecture _makes it trivial_. Whether or not you should allow it on security grounds is another question, and may depend on the type of OS.
+
+Also, I should mention, that all of those things I just listed were _actual_ things that happened to IO subsystems in OS design. So none of those are hypothetical things that don't usually occur, or which are cherry-picked to be beneficial to enum-based design. Those are basically just _the exact things that have happened_ over the past ~20 years of OS IO subsystem evolution in a broad sense.
+
+So what is really going on here? The problem, in my opinion, is that programs have paths between things. I have one place, like in the user code, where someone wants to do something. And I have another place, perhaps very far away like in a driver, where that thing has to happen. If we follow the style of classes for everything with small virtual functions that do one thing, we require that _the entire path_ between the two be _widened_ to include every possible operation the system needs to do. But why? Why are we duplicating these functions everywhere? Why not just make the path narrow, and use enums so that anyone who _wants_ to take action on the specific operation can, but those who don't want to don't have to?
+
+Another way of saying this is that type-based polymorphism, despite its promises, actually _multiplies_ every path by the operation count, everywhere in the system, for no benefit. Instead of taking the entire path from the application to the device driver and making that _entire_ path "wide" in the sense that every function has an implementation at every stage, why not just use enums to collapse that pipeline into a single function the entire way, until you _actually_ need to fan it out?
+
+Another way to say this is, if you can do multiple things with the same pattern, why not do them? What is the _benefit_ of multiplying the code?
+
+It's worth mentioning at this point, as an aside, that I am not so much criticizing OOP in general here as I am its modern interpretation (as it is commonly practiced today and as it appears in Java, C++, and in "Clean Code" as well). I think the design I described with the enum would be _at least somewhat familiar_ to an early OOP programmer or advocate like Alan Kay, because it is _more like message passing_ which is what they were all about. And while I don't really think it benefits programmers to think in terms of collections of objects passing messages, I am less critical of _that_ idea than the virtual methods idea, and I do use things that look like message passing fairly often (as I did in this case with loadable drivers).
+
+Now, in _most_ systems, I would _also_ be looking for ways to collapse across device types, too. But in this case, because we are specifically talking about a system where we say a priori that we want them to be loaded separately, then the only place we can do that is _inside_ the device driver, and we're not really talking about that part of the architecture. But if we were, I would be looking for those opportunities. So if, for example, several devices had similar interfaces, that only differed by a few things here and there, I would do _another_ non-"Clean Code" thing which is to collapse those into a single driver with "if's" based on the device types where appropriate.
+
+I'll stop there, since I mentioned a lot of things, but hopefully that gives the general idea. I use this same approach basically everywhere - anything that looks similar gets collapsed into one thing, with an enum or a flags field that differentiates it. And it tends to produce the polar opposite of "Clean Code"-style code, because that style typically does the opposite: it creates the _maximum_ number of types and functions, whereas I am trying to produce a much smaller number - perhaps not the _minimum_, but certainly much less than Clean Code.
