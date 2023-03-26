@@ -500,3 +500,26 @@ It's worth mentioning at this point, as an aside, that I am not so much criticiz
 Now, in _most_ systems, I would _also_ be looking for ways to collapse across device types, too. But in this case, because we are specifically talking about a system where we say a priori that we want them to be loaded separately, then the only place we can do that is _inside_ the device driver, and we're not really talking about that part of the architecture. But if we were, I would be looking for those opportunities. So if, for example, several devices had similar interfaces, that only differed by a few things here and there, I would do _another_ non-"Clean Code" thing which is to collapse those into a single driver with "if's" based on the device types where appropriate.
 
 I'll stop there, since I mentioned a lot of things, but hopefully that gives the general idea. I use this same approach basically everywhere - anything that looks similar gets collapsed into one thing, with an enum or a flags field that differentiates it. And it tends to produce the polar opposite of "Clean Code"-style code, because that style typically does the opposite: it creates the _maximum_ number of types and functions, whereas I am trying to produce a much smaller number - perhaps not the _minimum_, but certainly much less than Clean Code.
+
+**Bob**:
+OK, I think I see where you are going with this.  So first let me say: "Sure, looks good to me."  The bullet points you added after the fact are all quite valid and the design you picked works well in that case.  
+
+In the first point you assume that operations will increase beyond the two originally proposed.  And as we both agreed before, and as I wrote in _Clean Code_ (which, by the way, is not the same as your "Clean Code") when operations proliferate more rapidly than types, switch statements are better.
+
+In point two and three you raise the specter of muti-threading.  You are, of course, correct that queuing up operations is a lot easier if you use request packets of the type you designed.  No argument there.
+
+The last point proposed a kind of "hook" for unknown and unspecified possibilities in the future.  OK, if you think those unknown and unspecified possibilities are likely then you have to consider them early; but that raises a number of other concerns that we should likely not address in this document.  So I'll let that point pass.
+
+So now, where are we?
+
+You posed a solution that uses dynamic polymorphism to select between device types, and then a switch statement to select operations.  I have no problem with this.  It works well, and satisfies my concerns about dependency inversion and programmer cycles.  I will say, however, that it is ironic that after your video, and after all the stress that has been put on saving machine cycles, you eventually chose a design that sacrifices machine cycles to save programmer cycles.   After all, on the OS side you've got to package up that request packet, hand it to the dynamically dispatched handler, and then run the operation ID through a switch.  ;-)
+
+And so I think we wind up in the same place.  When operations proliferate more rapidly than types we both use switches.  When types proliferate more rapidly than operations we both use dynamic dispatch.  We are both willing to sacrifice machine cycles to save programmer cycles.
+
+We are two individuals on the same island, the only difference being that I wear a shirt emblazoned with _Clean Code_, and you wear one emblazoned with "Clean Code".  
+
+Thank you for a stimulating debate.  I appreciate the candor, and the civility that you exercized _here_, if not everywhere else.  I have come to respect your experience, your knowledge, and your articulation.  Writing is hard, and you appear to have mastered the art along with the art of software.  I hope in future we can do this again.  And if you ever want a recommendation to a publisher, let me know.
+
+
+
+
